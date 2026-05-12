@@ -4,7 +4,7 @@ Shared workspace for the UP SoComSci Hack-It-UP 2026 hackathon under Tech Week 2
 
 ## Current Direction
 
-Working concept: a borrowing readiness checker for small informal Filipino sellers. It helps users test whether a loan fits their actual cash yuan flow before they borrow.
+Working concept: a borrowing readiness checker for small informal Filipino sellers. It helps users test whether a loan fits their actual cash flow before they borrow.
 
 The project is aimed at the **FinTech for Change** theme and should stay grounded in Philippine financial inclusion, microenterprise resilience, and the Hack-It-UP judging criteria.
 
