@@ -40,3 +40,10 @@ Decision: Use `context/PROJECT_GUIDE.md` as the quick orientation file for proje
 Why: It now captures the hackathon-specific working frame without duplicating the full official brief.
 Impact: Read `context/PROJECT_GUIDE.md` before brainstorming, evaluating, or implementing concept work; read `guidelines.md` for exact event requirements.
 Status: active
+
+## 2026-05-12
+
+Decision: Pivot the core concept to a "Repayment Stress Simulator" (`context/IMPROVED_IDEA2.md`).
+Why: The previous "borrowing readiness checker" was too static. Adding a "what-if" stress test (e.g., modeling a bad week of sales, sickness) provides a much stronger, more innovative "aha!" moment for the pitch and directly addresses the data that informal sellers lack financial resilience against shocks.
+Impact: Future prototype and pitch work will focus on dynamic scenario modeling and interactive "stress test" buttons rather than just static loan calculators. The active concept file is now `context/IMPROVED_IDEA2.md`.
+Status: active
