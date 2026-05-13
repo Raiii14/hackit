@@ -46,7 +46,7 @@ This document outlines the user journeys and system logic for the Repayment Stre
 - **C. Common Foundations (For All Users):**
   - **Personal Survival Floor:** "How much do you *need* to take home for your family's basic daily needs (Food, Medicine, School)?"
   - **Existing Debt:** "Total daily or weekly payments for other loans you are currently paying off?"
-  - **Crisis Sensitivity:** "If you got sick or couldn't work for 3 days, how much would your income drop?" (Feeds **Scenario Testing**).
+  - **Income Drop Sensitivity:** "How much can your income drop before you cannot safely repay?" (Feeds **Percentage Drop Testing**).
 
 - **Feature Integrated:** **Contextual Micro-Lessons** (A tip appears: "Your 'Survival Floor' is your most important number. If a loan cuts into this, it puts your family at risk.")
 
@@ -87,7 +87,7 @@ This document outlines the user journeys and system logic for the Repayment Stre
 
 ### 4. Deep-Dive: Breakpoints & Calendar
 - **System Display:** Below the gauge, show the "Limits of Survival."
-  - **Breakpoint:** "You can survive exactly **3 bad sales days** before this loan becomes unsafe."
+  - **Breakpoint:** "Your income can drop by **30%** before this loan becomes unsafe."
   - **Calendar View:** A monthly calendar with "Danger Zones" highlighted where payments fall on slow days or "Restock Days."
 - **Feature Integrated:** **Breakpoint Analysis** and **Danger Zone Calendar**.
 
@@ -103,17 +103,17 @@ This document outlines the user journeys and system logic for the Repayment Stre
 ## Flow 3: The "What-If" Crisis (Simulating Disruptions)
 **Goal:** Prove the loan's resilience by modeling real-world unpredictable events that affect income.
 
-### 1. Scenario Selection
+### 1. Percentage Drop Selection
 - **User Action:** While viewing a Stress Test result (Flow 2), the user clicks on the "Test Your Resilience" section.
 - **System Display:** A set of interactive **Impact-Based Buttons**:
-  - **[Moderate Drop]:** Models a -30% income drop for 7 days.
-  - **[Major Disruption]:** Models a -60% income drop for 7 days.
-  - **[Zero Income]:** Models 0 income for 3 consecutive days.
+  - **[Moderate Drop - 30%]:** Models a 30% income drop for 7 days.
+  - **[Major Disruption - 60%]:** Models a 60% income drop for 7 days.
+  - **[Zero Income - 100%]:** Models a 100% income drop for 3 consecutive days.
   - **[Custom Slider]:** Allows user to manually drop income by any percentage (0% to 100%) to see the exact moment the gauge turns Red.
-- **Feature Integrated:** **Breakpoint & Scenario Stress Testing**.
+- **Feature Integrated:** **Breakpoint & Percentage Drop Testing**.
 
 ### 2. Dynamic Impact Animation
-- **System Action:** Instantly recalculates the **Cash Health Gauge** and **Breakpoint Analysis** based on the selected scenario.
+- **System Action:** Instantly recalculates the **Cash Health Gauge** and **Breakpoint Analysis** based on the selected percentage drop.
 - **System Display:** The Gauge needle moves in real-time.
   - *Example:* A "Green" loan (Safe) may swing to "Red" (Danger) when the [3-Day Sickness] scenario is activated.
 

@@ -10,11 +10,10 @@ This document lists the refined features for the project, combining the core str
 - **Outcome:** A dynamic visual gauge (Green/Yellow/Red) showing the cash health *after* the payment is made.
 - **"Aha!" Moment:** Translates abstract loan numbers into a simple "Safe" or "Danger" signal.
 
-## 2. Breakpoint & Scenario Stress Testing
-**Function:** Lets users "stress test" the loan against real-world disruptions.
-- **Breakpoint Analysis:** Tells the user exactly how many "bad sales days" they can survive before they can no longer afford the loan.
-- **One-Tap Scenarios:** Buttons for "Typhoon (-30% sales)", "Sick for 3 days (0 sales)", or "Price Hike (+10% expenses)".  
-// what could be the basis for those percentages or a better way to do this
+## 2. Breakpoint & Percentage Drop Testing
+**Function:** Lets users test how much income can drop before a loan becomes unsafe.
+- **Breakpoint Analysis:** Tells the user the exact income drop percentage they can survive before they can no longer afford the loan.
+- **Percentage Drop Use Cases:** Buttons for "10% Drop", "30% Drop", "60% Drop", and "100% Drop".
 - **"Aha!" Moment:** Shows the user precisely where their "breaking point" is before they sign the contract.
 
 ## 3. True Cost Revealer (Oliver's Suggestion)
@@ -41,11 +40,4 @@ This document lists the refined features for the project, combining the core str
 - **AI-Driven Clarity:** Uses simple, human language to explain financial terms based on the user's current data.
 - **"Aha!" Moment:** Provides "just-in-time" learning at the exact moment a decision is being made.
 
-## 7. Anonymised Impact Dashboard (Ecosystem View)
-**Function:** Shows the aggregate impact of the tool for researchers and NGOs.
-// why are researchers and NGOs are mentioned here? 
-- **Metrics:** Tracks "Loans Avoided" or "Safer Alternatives Chosen."
-- **Goal:** Positions the tool as a data-driven solution for financial inclusion in the Philippines.
-
----
 *Note: Technical features like "Login" and "Manual Database Entry" have been descoped to prioritize the live demo experience and the core "Aha!" moments.*
