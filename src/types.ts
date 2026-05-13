@@ -17,6 +17,17 @@ export type LoanInputs = {
   minimumBuffer: number;
 };
 
+export type CalendarDay = {
+  date: Date;
+  dayIndex: number;
+  dailyCash: number;
+  cumulativeCash: number;
+  cashAfterRepayment: number;
+  isStressed: boolean;
+  isDueDate: boolean;
+  status: RiskStatus;
+};
+
 export type SimulationResult = {
   daysUntilDue: number;
   stressCashLeft: number;
@@ -31,10 +42,13 @@ export type SimulationResult = {
   recommendedTerm: number;
   badDayDrop: number;
   shortfall: number;
+  calendar: CalendarDay[];
 };
 
 export type LoanRecord = LoanInputs &
   SimulationResult & {
     id: string;
     createdAt: string;
+    stressDrop: number;
+    stressKind: 'drop' | 'bad-day';
   };

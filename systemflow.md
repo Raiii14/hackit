@@ -1,175 +1,272 @@
 # System Flow Documentation
 
-This document outlines the user journeys and system logic for the Repayment Stress Simulator. It maps our features to specific use cases to ensure a smooth demo and implementation.
+This document defines the chronological product flow for LoanWise, the Repayment Stress Simulator. It is the implementation reference for moving a user from first entry to loan evaluation, stress testing, and saved history.
+
+The whole system should proceed in this order:
+
+1. **Flow 1: Start and Set Up Inputs** - get the user into guest mode or optional login, then collect the baseline cash-flow inputs.
+2. **Flow 2: Evaluate the Loan Offer** - calculate true cost, repayment fit, gauge status, and safety suggestions.
+3. **Flow 3: Stress-Test the Loan** - apply percentage drops or the user's bad-day baseline and update the result in real time.
+4. **Flow 4: Save, Review, and Close the Loan** - store the check, show history/dashboard data, and support an after-action report.
 
 ---
 
-## Flow 1: New User Onboarding & First Impression
-**Goal:** Take a first-time user (e.g., a sari-sari store owner) from landing to their first "Aha!" moment with minimal friction.
+## Flow 1: Start and Set Up Inputs
 
-### 1. Landing Page (The Hook)
-- **User Action:** Arrives via mobile web or app.
-- **System Display:** 
-  - Visual headline: "Is your next loan safe for your business?"
-  - Quick summary of the "Repayment Stress Simulator."
-  - **CTA:** [Start Free Stress Test] with an optional [Login for More Accurate Results] path.
-- **Feature Integrated:** Value proposition highlighting the **True Cost Revealer**.
+**Goal:** Let a first-time user reach a usable loan check with minimal friction.
+
+### 1. Entry Screen
+
+- **User Action:** Opens the web app on mobile or desktop.
+- **System Display:**
+  - Product signal: `LoanWise`.
+  - Primary prompt: "Is your next loan safe for your store?"
+  - Primary CTA: `Start free test`.
+  - Secondary path: `Use account`.
+- **System Rule:** The first screen must lead into the working simulator, not a static marketing page.
 
 ### 2. Guest Mode or Optional Login
-- **User Action:** Starts the stress test without logging in, or logs in only if they want more accurate results.
-- **Guest Requirement:** Ask only the six basic inputs needed for a fast estimate:
+
+- **User Action:** Continues as a guest, signs in, or creates an account.
+- **Guest Behavior:** The simulator works without login.
+- **Account Behavior:** If Supabase is configured and the user signs in, saved checks can be attached to that user's account.
+- **System Rule:** Login must improve persistence, not block the core stress test.
+
+### 3. Baseline Input Collection
+
+- **Required Guest Inputs:**
   - Amount to borrow
   - Total repayment
   - Due date
-  - Normal daily cash left after basic expenses
-  - Bad-day cash left after basic expenses
-  - Minimum cash they must keep
-- **Input Helper:** For the two cash-left fields, show an optional "Help me estimate" helper that calculates cash left from daily sales minus basic daily costs. The helper should not be required for the main guest flow.
-- **Optional Login Requirement:** If the user wants better accuracy, collect a richer business profile later: store type, sales pattern, recurring expenses, restocking needs, household survival floor, existing debts, and slow days.
+  - Normal daily cash left after expenses
+  - Bad-day cash left after expenses
+  - Minimum cash to keep after repayment
+- **Optional Helper:** For both cash-left inputs, the user may estimate cash left as:
+  - Cash Left = Daily Sales - Daily Costs
+- **Validation Rules:**
+  - Amounts cannot be negative.
+  - Days until due must be at least 1.
+  - Total repayment should be greater than or equal to amount borrowed. If it is lower, show a warning rather than blocking the demo.
+- **Next Step:** Once the six inputs exist, the system moves into Flow 2 automatically.
 
-### 3. Optional Accuracy Upgrade: Adaptive Cash Flow Profile
-**Goal:** Gather more accurate data only when the user chooses the login/profile path. Guest users can skip this and use the six basic inputs above.
+### 4. Dashboard Entry Point
 
-- **A. Category Selection:**
-  - System asks: "How do you earn your money?"
-    - **Option 1: I sell products** (Sari-sari, Online shop, Market vendor)
-    - **Option 2: I provide a service/gig** (Grab/Lalamove rider, Barber, Freelancer)
-    - **Option 3: I have a fixed salary** (Office worker, Kasambahay, Factory worker)
-
-- **B. Branching Questions (Based on Category):**
-  - **If Seller (Option 1):**
-    - "Average daily sales?"
-    - "How much do you spend on inventory/restocking?"
-    - "Which days are your slowest?"
-  - **If Service/Gig Worker (Option 2):**
-    - "Average daily earnings/tips?"
-    - "Daily costs to work (Gas, Load, Tool maintenance)?"
-    - "Which days do you typically take off or have low demand?"
-  - **If Fixed Salary (Option 3):**
-    - "Monthly take-home pay?"
-    - "Monthly fixed bills (Rent, Utilities, Internet)?"
-
-- **C. Common Foundations (For All Users):**
-  - **Personal Survival Floor:** "How much do you *need* to take home for your family's basic daily needs (Food, Medicine, School)?"
-  - **Existing Debt:** "Total daily or weekly payments for other loans you are currently paying off?"
-  - **Income Baseline:** "On a normal day, how much cash is left after basic expenses?"
-  - **Bad-Day Baseline:** "On a bad day, how much cash is left after basic expenses?"
-  - **Minimum Cash Buffer:** "What is the minimum cash you must keep after repayment?"
-
-- **Feature Integrated:** **Contextual Micro-Lessons** (A tip appears: "Your 'Survival Floor' is your most important number. If a loan cuts into this, it puts your family at risk.")
-
-### 4. Personal Dashboard (The Hub)
-- **User Action:** Arrives at the main screen.
-- **System Display:** 
-  - Current "Cash Health" status based on the guest estimate or saved profile.
-  - Visual Feed: "Recent Loans Checked" (empty for new user).
-  - **Primary CTA:** [Test a New Loan Offer].
-- **Feature Integrated:** **Danger Zone Calendar** (Shows a preview of the current month with no risks marked yet).
-
----
-
-## Flow 2: The Active Stress Test (Evaluating a Loan)
-**Goal:** Transform raw loan numbers into a clear "Safe" or "Dangerous" decision for the user.
-
-### 1. Loan Entry
-- **User Action:** Clicks [Test a New Loan Offer] from the Dashboard.
-- **Input Fields:** 
-  - Loan Amount (e.g., ₱5,000)
-  - Total Repayment (e.g., ₱7,500)
-  - Due Date or Term (e.g., 30 days)
-- **System Action:** Validates that the total repayment is greater than the amount borrowed.
-
-### 2. The "True Cost" Reveal
-- **System Display:** An immediate "True Cost" card appears before the full simulation.
-  - "This loan costs you **₱50 for every ₱100** you borrow."
-  - "Your daily interest cost is **₱83/day**."
-- **Feature Integrated:** **True Cost Revealer**.
-
-### 3. The Stress Simulation (The "Aha!" Moment)
-- **System Action:** Runs the loan numbers against the user's guest inputs or saved profile.
-- **Guest Formula:**
-  - Days Until Due = number of days from today to the due date.
-  - Projected Cash After Repayment = Normal Daily Cash Left After Expenses x Days Until Due - Total Repayment.
-  - The borrowed amount is not counted as spare cash because it is assumed to be used for inventory, bills, or another borrowing purpose.
-- **Gauge Logic:**
-  - **GREEN:** Projected cash after repayment is greater than or equal to the user's minimum cash buffer.
-  - **YELLOW:** Projected cash after repayment is non-negative but below the user's minimum cash buffer.
-  - **RED:** Projected cash after repayment is negative.
-- **System Display:** A large, dynamic **Cash Health Gauge**.
-  - **GREEN:** "Manageable. You maintain your survival floor and inventory needs."
-  - **YELLOW:** "Thin Buffer. A few bad sales days could force you to use your food budget to pay."
-  - **RED:** "High Risk. You will not have enough cash to pay."
-- **Feature Integrated:** **Dynamic Repayment Stress Simulator**.
-
-### 4. Deep-Dive: Breakpoints & Calendar
-- **System Display:** Below the gauge, show the "Limits of Survival."
-  - **Breakpoint:** "Your income can drop by **30%** before this loan becomes unsafe."
-  - **Calendar View:** A monthly calendar with "Danger Zones" highlighted where payments fall on slow days or "Restock Days."
-- **Feature Integrated:** **Breakpoint Analysis** and **Danger Zone Calendar**.
-
-### 5. Resolution & Suggestions
-- **User Action:** If the result is Yellow or Red, the user sees a "Safety Path" card.
+- **User Action:** Views the current simulator and saved history area.
 - **System Display:**
-  - "To stay in the GREEN, try borrowing **₱3,500** instead."
-  - "Or ask for a **45-day term** to lower the daily burden."
-- **Feature Integrated:** **Safer Borrowing Suggestions**.
+  - Current cash-health gauge.
+  - Recent saved checks table.
+  - Account panel if the user wants persistence.
+- **Next Step:** User evaluates the active loan offer in Flow 2.
 
 ---
 
-## Flow 3: The "What-If" Crisis (Simulating Disruptions)
-**Goal:** Prove the loan's resilience by modeling real-world unpredictable events that affect income.
+## Flow 2: Evaluate the Loan Offer
 
-### 1. Percentage Drop Selection
-- **User Action:** While viewing a Stress Test result (Flow 2), the user clicks on the "Test Your Resilience" section.
-- **System Display:** A set of interactive **Impact-Based Buttons**:
-  - **[Moderate Drop - 30%]:** Models a 30% income drop for 7 days.
-  - **[Major Disruption - 60%]:** Models a 60% income drop for 7 days.
-  - **[Zero Income - 100%]:** Models a 100% income drop for 3 consecutive days.
-  - **[My Bad Day]:** Uses the user's bad-day cash-left input as a personalized stress case.
-  - **[Custom Slider]:** Allows user to manually drop income by any percentage (0% to 100%) to see the exact moment the gauge turns Red.
-- **Feature Integrated:** **Breakpoint & Percentage Drop Testing**.
+**Goal:** Transform the raw loan offer into a clear repayment decision before any stress scenario is applied.
 
-### 2. Dynamic Impact Animation
-- **System Action:** Instantly recalculates the **Cash Health Gauge** and **Breakpoint Analysis** based on the selected percentage drop.
-  - For percentage buttons: Stress Daily Cash Left = Normal Daily Cash Left x (1 - Drop Percentage).
-  - For My Bad Day: Stress Daily Cash Left = Bad-Day Cash Left After Expenses.
-- **System Display:** The Gauge needle moves in real-time.
-  - *Example:* A "Green" loan (Safe) may swing to "Red" (Danger) when a 60% income drop is activated.
+### 1. Loan Offer Readiness
 
-### 3. Crisis Explanation & Impact
-- **System Display:** A blunt, factual summary of the financial gap:
-  - "You are short by **₱1,200** on your due date."
-  - "Warning: Your cash is fully depleted."
-- **Feature Integrated:** **Impact Status Reporting**.
+- **Trigger:** Flow 2 starts when the six baseline inputs from Flow 1 are present.
+- **System Inputs Used:**
+  - Amount to borrow
+  - Total repayment
+  - Due date
+  - Normal daily cash left after expenses
+  - Minimum cash to keep
+- **System Action:** Calculate the number of days from today to the due date.
+- **Formula:**
+  - Days Until Due = max(1, Due Date - Today)
 
-### 4. Resilience Recommendation
-- **System Display:** Updates the **Safer Borrowing Suggestions** to account for the crisis.
-  - "To survive this income drop with this loan, the math shows you need a **₱2,500 cash buffer** on hand *before* you borrow."
-  - "Alternatively, reducing the loan to **₱4,000** keeps your projected cash above the minimum buffer."
+### 2. True Cost Reveal
+
+- **System Action:** Show the cost of the offer before showing the full risk interpretation.
+- **Formulas:**
+  - Interest and Fees = Total Repayment - Amount Borrowed
+  - Cost per ₱100 Borrowed = Interest and Fees / Amount Borrowed x 100
+  - Daily Interest Cost = Interest and Fees / Days Until Due
+- **System Display:**
+  - "This loan costs ₱X for every ₱100 borrowed."
+  - "Your daily interest cost is ₱Y/day."
+  - "Total interest and fees: ₱Z."
+- **Purpose:** Make the repayment cost visible even if the user only thinks about the borrowed amount.
+
+### 3. Baseline Repayment Simulation
+
+- **System Action:** Calculate projected cash after repayment under normal conditions.
+- **Formula:**
+  - Projected Cash After Repayment = Normal Daily Cash Left After Expenses x Days Until Due - Total Repayment
+- **System Rule:** The borrowed amount is not counted as spare cash because the prototype assumes it will be used for inventory, bills, or another borrowing purpose.
+
+### 4. Cash Health Gauge
+
+- **Gauge Logic:**
+  - **GREEN:** Projected cash after repayment is greater than or equal to the minimum cash buffer.
+  - **YELLOW:** Projected cash after repayment is non-negative but below the minimum cash buffer.
+  - **RED:** Projected cash after repayment is negative.
+- **System Display:**
+  - **GREEN:** "Manageable. This loan keeps your cash above the minimum buffer after repayment."
+  - **YELLOW:** "Thin buffer. You can repay, but the remaining cash falls below your safety floor."
+  - **RED:** "High risk. The math shows a cash gap on or before the due date."
+- **Output:** The user sees a status, projected cash after repayment, days until due, and any cash shortfall.
+
+### 5. Breakpoint Analysis
+
+- **System Action:** Calculate how much income can drop before the loan stops clearing the user's minimum buffer.
+- **Formula:**
+  - Required Daily Cash = (Total Repayment + Minimum Cash Buffer) / Days Until Due
+  - Breakpoint Drop = 1 - (Required Daily Cash / Normal Daily Cash Left)
+- **Display Rule:** Clamp the breakpoint drop between 0% and 100%.
+- **System Display:** "Your daily cash left can drop by X% before this loan becomes unsafe."
+
+### 6. Safer Borrowing Suggestions
+
+- **Trigger:** Show suggestions for all statuses, but make them more prominent for Yellow and Red.
+- **System Actions:**
+  - Estimate a safer borrowed amount using the same repayment ratio.
+  - Estimate a longer term needed to stay above the minimum buffer.
+- **Formulas:**
+  - Repayment Ratio = Total Repayment / Amount Borrowed
+  - Safer Repayment Capacity = Normal Daily Cash Left x Days Until Due - Minimum Cash Buffer
+  - Suggested Borrow Amount = Safer Repayment Capacity / Repayment Ratio
+  - Suggested Term = ceil((Total Repayment + Minimum Cash Buffer) / Normal Daily Cash Left)
+- **System Display:**
+  - "To stay green, target around ₱X borrowed on this cost ratio."
+  - "Or ask for about Y days before repayment."
+- **Next Step:** User can continue to Flow 3 to test whether the baseline result survives income drops.
 
 ---
 
-## Flow 4: The After-Action Report (Closing the Loan)
-**Goal:** Review performance after full repayment to build the user's long-term financial record.
+## Flow 3: Stress-Test the Loan
 
-### 1. Loan Completion
-- **User Action:** Marks the loan as [Fully Paid] on the Dashboard.
-- **System Action:** Moves the loan from "Active" to "History."
+**Goal:** Show whether a loan that looks manageable under normal conditions can survive a drop in daily cash left.
 
-### 2. Performance Summary
-- **System Display:** A factual debrief of the loan period:
-  - "Loan Term: 30 Days."
-  - "Stress Days Survived: 5 (days where income was below average)."
-  - "Lowest Cash Buffer: ₱400 (Your survival floor stayed safe)."
-- **Feature Integrated:** **Impact Status Reporting**.
+### 1. Stress Mode Selection
 
-### 3. Profile Growth
-- **System Display:** Updates the user's **Borrowing Profile**.
-  - "You have successfully finished **1 loan**."
-  - "Your resilience score has increased."
-  - "Next Check: You are ready to test another loan offer."
-- **Feature Integrated:** **Borrowing Profile Over Time**.
+- **Trigger:** Flow 3 starts from the result screen in Flow 2.
+- **User Action:** Selects a stress mode.
+- **Available Modes:**
+  - Baseline: 0% drop
+  - 10% drop
+  - 30% drop
+  - 60% drop
+  - 100% drop
+  - My bad day
+  - Custom slider from 0% to 100%
+- **System Rule:** Use generic percentage drops. Do not hard-code named crisis claims such as typhoon, sickness, or rain as if the app knows the cause.
+
+### 2. Stress Cash Calculation
+
+- **For Percentage Drops:**
+  - Stress Daily Cash Left = Normal Daily Cash Left x (1 - Drop Percentage)
+- **For My Bad Day:**
+  - Stress Daily Cash Left = Bad-Day Cash Left After Expenses
+- **For Custom Slider:**
+  - Stress Daily Cash Left = Normal Daily Cash Left x (1 - Custom Drop Percentage)
+
+### 3. Stress Repayment Simulation
+
+- **Default Stress Rule:** Apply the selected stress cash value across the full term.
+- **Special 100% Drop Rule:** A 100% drop may be modeled as 3 zero-income days, with the remaining days using normal daily cash left.
+- **Full-Term Formula:**
+  - Stress Projected Cash = Stress Daily Cash Left x Days Until Due - Total Repayment
+- **Limited-Duration Formula:**
+  - Stress Projected Cash = Stress Daily Cash Left x Stress Days + Normal Daily Cash Left x Remaining Days - Total Repayment
+- **System Rule:** Reuse the same Green/Yellow/Red gauge logic from Flow 2.
+
+### 4. Real-Time Result Update
+
+- **System Action:** Instantly update:
+  - Cash-health gauge
+  - Projected cash after repayment
+  - Breakpoint percentage
+  - Cash shortfall
+  - Safer borrowing suggestion
+- **System Display:**
+  - If still Green: "This loan survives the selected income drop."
+  - If Yellow: "This loan becomes thin under the selected income drop."
+  - If Red: "This loan fails under the selected income drop."
+
+### 5. Crisis Explanation
+
+- **System Action:** Translate the stressed result into a factual warning.
+- **Display Rules:**
+  - If shortfall is greater than 0: "You are short by ₱X against your minimum cash buffer."
+  - If projected cash is below 0: "Your cash is fully depleted before or by the due date."
+  - If projected cash remains above the buffer: "Your buffer remains above ₱X after repayment."
+- **System Rule:** Keep the explanation blunt and mathematical. Do not imply certainty about real-world events.
+
+### 6. Stress-Based Recommendation
+
+- **System Action:** Recalculate the safety path using the stressed cash value.
+- **System Display:**
+  - "To survive this drop, you need ₱X cash buffer before borrowing."
+  - "Or reduce the borrowed amount to around ₱Y on this repayment ratio."
+  - "Or ask for about Z days before repayment."
+- **Next Step:** User can save the check or return to Flow 2 by selecting Baseline.
 
 ---
 
-## All flows for the MVP/Prototype are now documented.
+## Flow 4: Save, Review, and Close the Loan
+
+**Goal:** Turn a one-time stress test into a record the user can review later.
+
+### 1. Save Loan Check
+
+- **User Action:** Clicks `Save check`.
+- **Guest Behavior:** Save the check in browser local storage.
+- **Signed-In Behavior:** Save locally and insert the check into Supabase `public.loan_checks`.
+- **Saved Fields:**
+  - User id, if signed in
+  - Amount borrowed
+  - Total repayment
+  - Due date
+  - Normal daily cash left
+  - Bad-day cash left
+  - Minimum buffer
+  - Days until due
+  - Projected cash
+  - Status
+  - Stress label
+  - Cost per ₱100
+  - Breakpoint drop
+
+### 2. Dashboard History
+
+- **System Display:**
+  - Total saved checks
+  - Green checks
+  - Risky checks
+  - Average cost per ₱100
+  - Recent loan-check table
+- **Table Columns:**
+  - Date
+  - Borrowed amount
+  - Total repayment
+  - Stress mode
+  - Projected cash
+  - Status
+
+### 3. Loan Completion
+
+- **User Action:** Marks a real loan as fully paid. This is a future enhancement for the MVP unless time allows.
+- **System Action:** Move the loan from active checks to history.
+- **System Rule:** Do not claim repayment success automatically. The user must mark it manually.
+
+### 4. After-Action Report
+
+- **System Display:** A factual debrief:
+  - Loan term
+  - Final status at the time it was saved or closed
+  - Lowest projected cash buffer from the selected stress case
+  - Whether the user's minimum buffer stayed protected
+- **Feature Integrated:** Impact status reporting and borrowing profile over time.
+
+---
+
+## MVP Implementation Notes
+
+- Flow 1 should keep guest mode first.
+- Flow 2 is the core decision engine.
+- Flow 3 is the demo's main "aha" moment.
+- Flow 4 should support local history now and Supabase persistence when auth is configured.
+- The app must never present itself as a lender, credit bureau, guaranteed approval tool, or financial advisor.

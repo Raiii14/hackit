@@ -693,6 +693,310 @@ input[type="range"] {
   font-size: 14px;
 }
 
+/* ── Calendar Section ─────────────────────────────── */
+
+.calendar-section {
+  padding: 56px 0;
+}
+
+.calendar-card {
+  position: relative;
+  background: var(--lifted);
+  border: 1px solid var(--line);
+  border-radius: 40px;
+  padding: 32px;
+  box-shadow: rgba(0, 0, 0, 0.08) 0 24px 48px;
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.calendar-header h3 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.calendar-nav {
+  width: 40px;
+  height: 40px;
+}
+
+.calendar-nav svg {
+  width: 18px;
+  height: 18px;
+}
+
+.calendar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.legend-green {
+  background: var(--green);
+}
+
+.legend-yellow {
+  background: var(--yellow);
+}
+
+.legend-red {
+  background: var(--red);
+}
+
+.legend-stressed {
+  background: repeating-linear-gradient(
+    45deg,
+    var(--orange),
+    var(--orange) 2px,
+    transparent 2px,
+    transparent 4px
+  );
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calendar-weekday {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 8px 0;
+}
+
+.calendar-cell {
+  position: relative;
+  min-height: 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border-radius: 14px;
+  padding: 8px 4px;
+  border: 1.5px solid transparent;
+  cursor: default;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.calendar-cell:not(.cell-empty):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  z-index: 2;
+}
+
+.cell-empty {
+  background: transparent;
+}
+
+.cell-green {
+  background: rgba(21, 122, 75, 0.08);
+  border-color: rgba(21, 122, 75, 0.18);
+}
+
+.cell-yellow {
+  background: rgba(154, 106, 5, 0.08);
+  border-color: rgba(154, 106, 5, 0.18);
+}
+
+.cell-red {
+  background: rgba(180, 35, 24, 0.08);
+  border-color: rgba(180, 35, 24, 0.18);
+}
+
+.cell-stressed::after {
+  content: '⚡';
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  font-size: 10px;
+}
+
+.cell-due {
+  border-width: 2.5px;
+  border-style: solid;
+  animation: pulse-due 2s ease-in-out infinite;
+}
+
+.cell-due.cell-green {
+  border-color: var(--green);
+}
+
+.cell-due.cell-yellow {
+  border-color: var(--yellow);
+}
+
+.cell-due.cell-red {
+  border-color: var(--red);
+}
+
+@keyframes pulse-due {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(243, 115, 56, 0.3); }
+  50% { box-shadow: 0 0 0 6px rgba(243, 115, 56, 0); }
+}
+
+.cell-date {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1;
+}
+
+.cell-amount {
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.calendar-tooltip {
+  margin-top: 16px;
+  padding: 20px;
+  border-radius: 20px;
+  background: #fff;
+  border: 1px solid var(--line);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  animation: tooltip-in 0.2s ease;
+}
+
+@keyframes tooltip-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.calendar-tooltip strong {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 15px;
+}
+
+.tooltip-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 16px;
+  font-size: 14px;
+}
+
+.tooltip-grid span:nth-child(odd) {
+  color: var(--muted);
+}
+
+.tooltip-green {
+  color: var(--green);
+  font-weight: 600;
+}
+
+.tooltip-yellow {
+  color: var(--yellow);
+  font-weight: 600;
+}
+
+.tooltip-red {
+  color: var(--red);
+  font-weight: 600;
+}
+
+.tooltip-stress,
+.tooltip-due {
+  display: inline-block;
+  margin-top: 10px;
+  margin-right: 12px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.calendar-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+  padding: 16px 20px;
+  border-radius: 16px;
+  background: var(--canvas);
+  border: 1px solid var(--line);
+}
+
+.calendar-summary svg {
+  width: 20px;
+  height: 20px;
+  color: var(--signal);
+  flex-shrink: 0;
+}
+
+.calendar-summary p {
+  margin: 0;
+  font-size: 15px;
+  color: var(--charcoal);
+}
+
+/* ── Load Button in History ─────────────────────────── */
+
+.load-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.load-btn svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2;
+}
+
+.load-btn:hover {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--canvas);
+}
+
+.history-row {
+  transition: background 0.15s ease;
+}
+
+.history-row:hover {
+  background: rgba(243, 115, 56, 0.04);
+}
+
+/* ── Media Queries ─────────────────────────────────── */
+
 @media (max-width: 1023px) {
   .nav-links {
     display: none;
@@ -757,7 +1061,8 @@ input[type="range"] {
   .hero-section,
   .workbench,
   .dashboard-section,
-  .account-section {
+  .account-section,
+  .calendar-section {
     padding: 40px 0;
   }
 
@@ -773,14 +1078,16 @@ input[type="range"] {
   .input-panel,
   .results-panel,
   .auth-panel,
-  .history-table-wrap {
+  .history-table-wrap,
+  .calendar-card {
     border-radius: 32px;
   }
 
   .gauge-panel,
   .input-panel,
   .results-panel,
-  .auth-panel {
+  .auth-panel,
+  .calendar-card {
     padding: 24px;
   }
 
@@ -793,4 +1100,33 @@ input[type="range"] {
   .account-copy::before {
     white-space: normal;
   }
+
+  .calendar-cell {
+    min-height: 52px;
+    border-radius: 10px;
+    padding: 6px 2px;
+  }
+
+  .cell-date {
+    font-size: 12px;
+  }
+
+  .cell-amount {
+    font-size: 9px;
+  }
+
+  .cell-stressed::after {
+    font-size: 8px;
+    top: 1px;
+    right: 2px;
+  }
+
+  .calendar-legend {
+    gap: 10px;
+  }
+
+  .legend-item {
+    font-size: 11px;
+  }
 }
+

@@ -1,4 +1,4 @@
-import type { LoanInputs, RiskStatus, SimulationResult, StressMode } from './types';
+import type { CalendarDay, LoanInputs, RiskStatus, SimulationResult, StressMode } from './types';
 
 export const stressModes: StressMode[] = [
   {
@@ -76,6 +76,51 @@ export function getStatus(projectedCash: number, minimumBuffer: number): RiskSta
   return 'green';
 }
 
+function buildCalendar(
+  inputs: LoanInputs,
+  stressMode: StressMode,
+  customDrop: number,
+  daysUntilDue: number,
+): CalendarDay[] {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const calendar: CalendarDay[] = [];
+
+  const stressDays = stressMode.durationDays ?? daysUntilDue;
+
+  for (let i = 1; i <= daysUntilDue; i++) {
+    const date = new Date(today.getTime() + i * DAY_MS);
+    const isStressed = i <= stressDays;
+
+    let dailyCash: number;
+    if (stressMode.kind === 'bad-day') {
+      dailyCash = inputs.badDayCashLeft;
+    } else if (isStressed) {
+      dailyCash = inputs.normalCashLeft * (1 - customDrop / 100);
+    } else {
+      dailyCash = inputs.normalCashLeft;
+    }
+
+    const prevCumulative = i === 1 ? 0 : calendar[i - 2].cumulativeCash;
+    const cumulativeCash = prevCumulative + dailyCash;
+    const cashAfterRepayment = cumulativeCash - inputs.totalRepayment;
+    const isDueDate = i === daysUntilDue;
+
+    calendar.push({
+      date,
+      dayIndex: i,
+      dailyCash,
+      cumulativeCash,
+      cashAfterRepayment,
+      isStressed: stressMode.kind === 'bad-day' || (isStressed && customDrop > 0),
+      isDueDate,
+      status: getStatus(cashAfterRepayment, inputs.minimumBuffer),
+    });
+  }
+
+  return calendar;
+}
+
 export function simulateLoan(
   inputs: LoanInputs,
   stressMode: StressMode,
@@ -126,6 +171,8 @@ export function simulateLoan(
       ? Math.ceil((inputs.totalRepayment + inputs.minimumBuffer) / inputs.normalCashLeft)
       : daysUntilDue;
 
+  const calendar = buildCalendar(inputs, stressMode, customDrop, daysUntilDue);
+
   return {
     daysUntilDue,
     stressCashLeft,
@@ -140,5 +187,7 @@ export function simulateLoan(
     recommendedTerm: Math.max(daysUntilDue + 1, recommendedTerm),
     badDayDrop,
     shortfall: Math.max(0, inputs.minimumBuffer - projectedCash),
+    calendar,
   };
 }
+
