@@ -82,7 +82,7 @@ This document outlines the user journeys and system logic for the Repayment Stre
 - **System Display:** A large, dynamic **Cash Health Gauge**.
   - **GREEN:** "Manageable. You maintain your survival floor and inventory needs."
   - **YELLOW:** "Thin Buffer. A few bad sales days could force you to use your food budget to pay."
-  - **RED:** "High Risk. This loan is likely to cause a cash crunch or default."
+  - **RED:** "High Risk. You will not have enough cash to pay."
 - **Feature Integrated:** **Dynamic Repayment Stress Simulator**.
 
 ### 4. Deep-Dive: Breakpoints & Calendar
@@ -118,10 +118,10 @@ This document outlines the user journeys and system logic for the Repayment Stre
   - *Example:* A "Green" loan (Safe) may swing to "Red" (Danger) when the [3-Day Sickness] scenario is activated.
 
 ### 3. Crisis Explanation & Impact
-- **System Display:** A high-impact summary of the "New Reality":
-  - "In this scenario, you would be short by **₱1,200** on your due date."
-  - "Warning: Your cash buffer is fully depleted. You would need to borrow more or cut family spending to repay."
-- **Feature Integrated:** **Contextual Micro-Lessons**.
+- **System Display:** A blunt, factual summary of the financial gap:
+  - "You are short by **₱1,200** on your due date."
+  - "Warning: Your cash is fully depleted."
+- **Feature Integrated:** **Impact Status Reporting**.
 
 ### 4. Resilience Recommendation
 - **System Display:** Updates the **Safer Borrowing Suggestions** to account for the crisis.
@@ -130,5 +130,27 @@ This document outlines the user journeys and system logic for the Repayment Stre
 
 ---
 
-## Future Flows to Document:
-- **Flow 4:** The After-Action Report (Closing out a loan and seeing progress).
+## Flow 4: The After-Action Report (Closing the Loan)
+**Goal:** Review performance after full repayment to build the user's long-term financial record.
+
+### 1. Loan Completion
+- **User Action:** Marks the loan as [Fully Paid] on the Dashboard.
+- **System Action:** Moves the loan from "Active" to "History."
+
+### 2. Performance Summary
+- **System Display:** A factual debrief of the loan period:
+  - "Loan Term: 30 Days."
+  - "Stress Days Survived: 5 (days where income was below average)."
+  - "Lowest Cash Buffer: ₱400 (Your survival floor stayed safe)."
+- **Feature Integrated:** **Impact Status Reporting**.
+
+### 3. Profile Growth
+- **System Display:** Updates the user's **Borrowing Profile**.
+  - "You have successfully finished **1 loan**."
+  - "Your resilience score has increased."
+  - "Next Check: You are ready to test another loan offer."
+- **Feature Integrated:** **Borrowing Profile Over Time**.
+
+---
+
+## All flows for the MVP/Prototype are now documented.
