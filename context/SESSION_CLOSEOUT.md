@@ -40,3 +40,11 @@ Use this at the end of a meaningful work session and before opening or merging a
 - Files to update: `README.md`, `TEAM_WORKFLOW.md`, `context/DECISIONS.md`, and `context/SESSION_CLOSEOUT.md`.
 - Stale-fact check: Read-first/source-of-truth docs now include `DESIGN.md`, `features.md`, and `systemflow.md`; historical idea files are background only.
 - Next focus: Start the next chat from `TEAM_WORKFLOW.md`, then implement the prototype using `features.md`, `systemflow.md`, and `DESIGN.md`.
+
+## 2026-05-14 Prototype Closeout
+
+- Stable facts to memory: none.
+- Decisions to log: First website prototype is LoanWise on Vite + React + TypeScript with optional Supabase email/password auth; saved history/dashboard is local-first until Supabase exists.
+- Files to update: `README.md`, `context/DECISIONS.md`, `context/SESSION_CLOSEOUT.md`, app source files in `src/`, project config files, and `supabase/schema.sql`.
+- Stale-fact check: `README.md`, `TEAM_WORKFLOW.md`, `features.md`, `systemflow.md`, `DESIGN.md`, and `context/DECISIONS.md` still agree on a repayment stress simulator, six-input guest mode, generic percentage-drop testing, optional account path, and design guardrails.
+- Next focus: Create the Supabase project, add `.env.local`, run `supabase/schema.sql`, and deploy the Vite app on Vercel with the same environment variables.

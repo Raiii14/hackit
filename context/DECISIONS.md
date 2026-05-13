@@ -69,6 +69,20 @@ Why: Previous pull requests skipped `context/SESSION_CLOSEOUT.md`, causing stale
 Impact: Before opening or merging a pull request, update owning files, log durable decisions, and check that `README.md`, `TEAM_WORKFLOW.md`, `features.md`, `systemflow.md`, `DESIGN.md`, and `context/DECISIONS.md` agree. Stale facts are a review blocker.
 Status: active
 
+## 2026-05-14
+
+Decision: Build the first website prototype as LoanWise using Vite, React, TypeScript, and optional Supabase email/password auth.
+Why: The team requested a one-shot localhost prototype now, with Supabase accounts later and Vercel as the likely deployment path.
+Impact: Guest mode must remain fully usable without Supabase credentials. Account features should degrade gracefully until `.env.local` is configured, and Vercel deployment should use standard Vite environment variables.
+Status: active
+
+## 2026-05-14
+
+Decision: Include saved loan history and dashboard tables in the prototype while keeping persistence local-first.
+Why: The team wanted history/dashboard tables in the one-shot build, but no Supabase project exists yet.
+Impact: Saved checks are stored in browser local storage now. When Supabase is configured, `supabase/schema.sql` provides the `loan_checks` table and row-level-security policies for user-owned saved checks.
+Status: active
+
 ## 2026-05-04
 
 Decision: Keep project memory short and refer detailed context back to project files.
