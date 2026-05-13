@@ -3,7 +3,10 @@ import type { Session } from '@supabase/supabase-js';
 import {
   AlertTriangle,
   ArrowRight,
+  Calendar,
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
   CircleDollarSign,
   Clock3,
   Gauge,
@@ -13,6 +16,7 @@ import {
   Mail,
   Menu,
   PiggyBank,
+  RotateCcw,
   Save,
   Search,
   ShieldAlert,
@@ -20,7 +24,7 @@ import {
 } from 'lucide-react';
 import { currency, percent, simulateLoan, stressModes } from './logic';
 import { isSupabaseConfigured, supabase } from './supabaseClient';
-import type { LoanInputs, LoanRecord, RiskStatus, StressMode } from './types';
+import type { CalendarDay, LoanInputs, LoanRecord, RiskStatus, StressMode } from './types';
 
 const historyKey = 'loanwise-history';
 
@@ -167,8 +171,10 @@ function App() {
       ...result,
       id: crypto.randomUUID(),
       createdAt: new Date().toISOString(),
+      stressDrop: customDrop,
+      stressKind: selectedStress.kind,
     };
-    const nextHistory = [record, ...history].slice(0, 8);
+    const nextHistory = [record, ...history].slice(0, 20);
     setHistory(nextHistory);
     writeHistory(nextHistory);
     setSaveMessage('Saved to this browser.');
@@ -194,6 +200,41 @@ function App() {
     setSaveMessage(error ? `Saved locally. Supabase skipped: ${error.message}` : 'Saved locally and to Supabase.');
   }
 
+  function loadFromHistory(record: LoanRecord) {
+    setInputs({
+      amountBorrowed: record.amountBorrowed,
+      totalRepayment: record.totalRepayment,
+      dueDate: record.dueDate,
+      normalCashLeft: record.normalCashLeft,
+      badDayCashLeft: record.badDayCashLeft,
+      minimumBuffer: record.minimumBuffer,
+    });
+
+    if (record.stressKind === 'bad-day') {
+      const badDayMode = stressModes.find((m) => m.kind === 'bad-day');
+      if (badDayMode) setSelectedStress(badDayMode);
+    } else {
+      const matchingMode = stressModes.find(
+        (m) => m.kind === 'drop' && m.drop === record.stressDrop,
+      );
+      if (matchingMode) {
+        setSelectedStress(matchingMode);
+      } else {
+        setSelectedStress({
+          label: `Custom drop - ${record.stressDrop}%`,
+          shortLabel: `${record.stressDrop}% drop`,
+          kind: 'drop',
+          drop: record.stressDrop,
+          durationDays: null,
+        });
+      }
+      setCustomDrop(record.stressDrop);
+    }
+
+    setSaveMessage('');
+    document.getElementById('simulator')?.scrollIntoView({ behavior: 'smooth' });
+  }
+
   function applyEstimate(kind: 'normal' | 'bad') {
     const estimator = kind === 'normal' ? normalEstimator : badEstimator;
     const value = Math.max(0, estimator.sales - estimator.costs);
@@ -215,6 +256,7 @@ function App() {
         </a>
         <nav className="nav-links" aria-label="Primary">
           <a href="#simulator">Simulator</a>
+          <a href="#calendar">Calendar</a>
           <a href="#dashboard">Dashboard</a>
           <a href="#account">Account</a>
         </nav>
@@ -386,6 +428,8 @@ function App() {
           </section>
         </section>
 
+        <RepaymentCalendar calendar={result.calendar} totalRepayment={inputs.totalRepayment} minimumBuffer={inputs.minimumBuffer} />
+
         <section className="dashboard-section" id="dashboard">
           <div className="section-heading">
             <p className="eyebrow"><span /> Saved history</p>
@@ -409,16 +453,17 @@ function App() {
                   <th>Stress</th>
                   <th>Projected cash</th>
                   <th>Status</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
                 {history.length === 0 ? (
                   <tr>
-                    <td colSpan={6}>No saved checks yet. Run the simulator and save one result.</td>
+                    <td colSpan={7}>No saved checks yet. Run the simulator and save one result.</td>
                   </tr>
                 ) : (
                   history.map((item) => (
-                    <tr key={item.id}>
+                    <tr key={item.id} className="history-row">
                       <td>{new Date(item.createdAt).toLocaleDateString('en-PH')}</td>
                       <td>{currency(item.amountBorrowed)}</td>
                       <td>{currency(item.totalRepayment)}</td>
@@ -428,6 +473,17 @@ function App() {
                         <span className={`status-pill status-${item.status}`}>
                           {statusCopy[item.status].title}
                         </span>
+                      </td>
+                      <td>
+                        <button
+                          className="load-btn"
+                          type="button"
+                          title="Load this check into the simulator"
+                          onClick={() => loadFromHistory(item)}
+                        >
+                          <RotateCcw aria-hidden="true" />
+                          Load
+                        </button>
                       </td>
                     </tr>
                   ))
@@ -585,6 +641,160 @@ function Estimator({
   );
 }
 
+function RepaymentCalendar({
+  calendar,
+  totalRepayment,
+  minimumBuffer,
+}: {
+  calendar: CalendarDay[];
+  totalRepayment: number;
+  minimumBuffer: number;
+}) {
+  const [viewMonth, setViewMonth] = useState<number>(0);
+
+  const months = useMemo(() => {
+    if (calendar.length === 0) return [];
+
+    const grouped: { key: string; label: string; days: CalendarDay[]; year: number; month: number }[] = [];
+    for (const day of calendar) {
+      const y = day.date.getFullYear();
+      const m = day.date.getMonth();
+      const key = `${y}-${m}`;
+      let group = grouped.find((g) => g.key === key);
+      if (!group) {
+        group = {
+          key,
+          label: day.date.toLocaleDateString('en-PH', { month: 'long', year: 'numeric' }),
+          days: [],
+          year: y,
+          month: m,
+        };
+        grouped.push(group);
+      }
+      group.days.push(day);
+    }
+    return grouped;
+  }, [calendar]);
+
+  useEffect(() => {
+    setViewMonth(0);
+  }, [months.length]);
+
+  if (calendar.length === 0) return null;
+
+  const currentGroup = months[Math.min(viewMonth, months.length - 1)];
+  if (!currentGroup) return null;
+
+  const firstDayOfMonth = new Date(currentGroup.year, currentGroup.month, 1).getDay();
+  const daysInMonth = new Date(currentGroup.year, currentGroup.month + 1, 0).getDate();
+
+  const dayMap = new Map<number, CalendarDay>();
+  for (const d of currentGroup.days) {
+    dayMap.set(d.date.getDate(), d);
+  }
+
+  const cells: (CalendarDay | null)[] = [];
+  for (let i = 0; i < firstDayOfMonth; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) {
+    cells.push(dayMap.get(d) ?? null);
+  }
+
+  const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  const [tooltip, setTooltip] = useState<CalendarDay | null>(null);
+
+  return (
+    <section className="calendar-section" id="calendar">
+      <div className="section-heading">
+        <p className="eyebrow"><span /> Repayment breakdown</p>
+        <h2>Payment calendar</h2>
+      </div>
+
+      <div className="calendar-card">
+        <div className="calendar-header">
+          <button
+            className="icon-button calendar-nav"
+            type="button"
+            disabled={viewMonth === 0}
+            onClick={() => setViewMonth((v) => Math.max(0, v - 1))}
+            aria-label="Previous month"
+          >
+            <ChevronLeft aria-hidden="true" />
+          </button>
+          <h3>{currentGroup.label}</h3>
+          <button
+            className="icon-button calendar-nav"
+            type="button"
+            disabled={viewMonth >= months.length - 1}
+            onClick={() => setViewMonth((v) => Math.min(months.length - 1, v + 1))}
+            aria-label="Next month"
+          >
+            <ChevronRight aria-hidden="true" />
+          </button>
+        </div>
+
+        <div className="calendar-legend">
+          <span className="legend-item"><span className="legend-dot legend-green" /> Above buffer</span>
+          <span className="legend-item"><span className="legend-dot legend-yellow" /> Below buffer</span>
+          <span className="legend-item"><span className="legend-dot legend-red" /> Cash gap</span>
+          <span className="legend-item"><span className="legend-dot legend-stressed" /> Stressed day</span>
+        </div>
+
+        <div className="calendar-grid">
+          {weekdays.map((wd) => (
+            <div key={wd} className="calendar-weekday">{wd}</div>
+          ))}
+          {cells.map((day, i) => (
+            <div
+              key={i}
+              className={[
+                'calendar-cell',
+                day ? `cell-${day.status}` : 'cell-empty',
+                day?.isDueDate ? 'cell-due' : '',
+                day?.isStressed ? 'cell-stressed' : '',
+              ].join(' ')}
+              onMouseEnter={() => day && setTooltip(day)}
+              onMouseLeave={() => setTooltip(null)}
+            >
+              {day ? (
+                <>
+                  <span className="cell-date">{day.date.getDate()}</span>
+                  <span className="cell-amount">{currency(day.dailyCash)}</span>
+                </>
+              ) : null}
+            </div>
+          ))}
+        </div>
+
+        {tooltip && (
+          <div className="calendar-tooltip" aria-live="polite">
+            <strong>Day {tooltip.dayIndex} — {tooltip.date.toLocaleDateString('en-PH', { weekday: 'short', month: 'short', day: 'numeric' })}</strong>
+            <div className="tooltip-grid">
+              <span>Daily cash:</span><span>{currency(tooltip.dailyCash)}</span>
+              <span>Cumulative:</span><span>{currency(tooltip.cumulativeCash)}</span>
+              <span>After repayment:</span><span className={`tooltip-${tooltip.status}`}>{currency(tooltip.cashAfterRepayment)}</span>
+              <span>Repayment due:</span><span>{currency(totalRepayment)}</span>
+              <span>Buffer target:</span><span>{currency(minimumBuffer)}</span>
+            </div>
+            {tooltip.isStressed && <small className="tooltip-stress">⚡ Stressed day</small>}
+            {tooltip.isDueDate && <small className="tooltip-due">📅 Due date</small>}
+          </div>
+        )}
+
+        <div className="calendar-summary">
+          <Calendar aria-hidden="true" />
+          <p>
+            {calendar.length} days tracked.
+            Final projected cash: <strong className={`tooltip-${calendar[calendar.length - 1].status}`}>
+              {currency(calendar[calendar.length - 1].cashAfterRepayment)}
+            </strong>
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Metric({
   icon,
   label,
@@ -604,3 +814,4 @@ function Metric({
 }
 
 export default App;
+
