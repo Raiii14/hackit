@@ -13,7 +13,8 @@ This document lists the refined features for the project, combining the core str
 ## 2. Breakpoint & Scenario Stress Testing
 **Function:** Lets users "stress test" the loan against real-world disruptions.
 - **Breakpoint Analysis:** Tells the user exactly how many "bad sales days" they can survive before they can no longer afford the loan.
-- **One-Tap Scenarios:** Buttons for "Typhoon (-30% sales)", "Sick for 3 days (0 sales)", or "Price Hike (+10% expenses)".
+- **One-Tap Scenarios:** Buttons for "Typhoon (-30% sales)", "Sick for 3 days (0 sales)", or "Price Hike (+10% expenses)".  
+// what could be the basis for those percentages or a better way to do this
 - **"Aha!" Moment:** Shows the user precisely where their "breaking point" is before they sign the contract.
 
 ## 3. True Cost Revealer (Oliver's Suggestion)
@@ -42,6 +43,7 @@ This document lists the refined features for the project, combining the core str
 
 ## 7. Anonymised Impact Dashboard (Ecosystem View)
 **Function:** Shows the aggregate impact of the tool for researchers and NGOs.
+// why are researchers and NGOs are mentioned here? 
 - **Metrics:** Tracks "Loans Avoided" or "Safer Alternatives Chosen."
 - **Goal:** Positions the tool as a data-driven solution for financial inclusion in the Philippines.
 
