@@ -4,9 +4,31 @@ Shared workspace for the UP SoComSci Hack-It-UP 2026 hackathon under Tech Week 2
 
 ## Current Direction
 
-Working concept: a repayment stress simulator for small informal Filipino sellers. It helps users test whether a loan still fits their cash flow after income drops before they borrow.
+Working concept: **LoanWise**, a repayment stress simulator for small informal Filipino sellers. It helps users test whether a loan still fits their cash flow after income drops before they borrow.
 
 The project is aimed at the **FinTech for Change** theme and should stay grounded in Philippine financial inclusion, microenterprise resilience, and the Hack-It-UP judging criteria.
+
+## Prototype
+
+The current website prototype is a Vite + React + TypeScript app with optional Supabase email/password auth.
+
+Run locally:
+
+```bash
+npm install
+npm run dev
+```
+
+Production check:
+
+```bash
+npm run lint
+npm run build
+```
+
+Supabase is intentionally optional for localhost. Guest mode and browser-saved history work without credentials. To enable accounts later, create `.env.local` from `.env.example`, add the Supabase project URL and anon key, then run `supabase/schema.sql` in the Supabase SQL editor.
+
+The app is ready for Vercel deployment as a standard Vite project. Add the same `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` values in Vercel project environment variables before deploying auth-enabled builds.
 
 ## Start Here
 
@@ -28,6 +50,7 @@ The project is aimed at the **FinTech for Change** theme and should stay grounde
 - `context/OLD_IDEAS.md` - earlier ideas and why they were not selected.
 - `context/DECISIONS.md` - stable decisions that affect later work.
 - `context/SESSION_CLOSEOUT.md` - checklist for ending meaningful work sessions.
+- `supabase/schema.sql` - optional Supabase table and row-level-security setup for saved loan checks.
 
 ## Collaboration Rule
 
