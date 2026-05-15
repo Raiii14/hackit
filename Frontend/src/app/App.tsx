@@ -3,7 +3,6 @@ import { Shield, History } from "lucide-react";
 import { LandingPage } from "./components/LandingPage";
 import { StepIndicator } from "./components/StepIndicator";
 import { StepBaseline } from "./components/StepBaseline";
-import { StepEvaluation } from "./components/StepEvaluation";
 import { StepStressTest } from "./components/StepStressTest";
 import { StepHistory } from "./components/StepHistory";
 import type { UiLoanInputs } from "../lib/loanAdapter";
@@ -70,7 +69,7 @@ export default function App() {
       peakStressLevel: peakStress,
     };
     setSavedEvaluations((prev) => [saved, ...prev]);
-    setCurrentStep(4);
+    setCurrentStep(3);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -94,8 +93,8 @@ export default function App() {
 
   const canNavigate = (step: number) => {
     if (step === 1) return true;
-    if (step === 2 || step === 3) return baselineEvaluation !== null;
-    if (step === 4) return savedEvaluations.length > 0;
+    if (step === 2) return baselineEvaluation !== null;
+    if (step === 3) return savedEvaluations.length > 0;
     return false;
   };
 
@@ -109,7 +108,7 @@ export default function App() {
         }}
         onUseAccount={() => {
           if (savedEvaluations.length > 0) {
-            setCurrentStep(4);
+            setCurrentStep(3);
           } else {
             setCurrentStep(1);
           }
@@ -165,9 +164,9 @@ export default function App() {
             </div>
           </button>
 
-          {savedEvaluations.length > 0 && currentStep !== 4 && (
+          {savedEvaluations.length > 0 && currentStep !== 3 && (
             <button
-              onClick={() => setCurrentStep(4)}
+              onClick={() => setCurrentStep(3)}
               className="flex items-center gap-1.5"
               style={{
                 background: "none",
@@ -197,28 +196,19 @@ export default function App() {
           <StepBaseline inputs={inputs} onNext={handleEvaluate} />
         )}
 
-        {currentStep === 2 && baselineEvaluation && (
-          <StepEvaluation
-            inputs={inputs}
-            result={baselineEvaluation}
-            onBack={() => setCurrentStep(1)}
-            onNext={() => setCurrentStep(3)}
-          />
-        )}
-
-        {currentStep === 3 && stressedEvaluation && baselineEvaluation && (
+        {currentStep === 2 && stressedEvaluation && baselineEvaluation && (
           <StepStressTest
             inputs={inputs}
             result={stressedEvaluation}
             baselineResult={baselineEvaluation}
             stressLevel={stressLevel}
             onStressChange={setStressLevel}
-            onBack={() => setCurrentStep(2)}
+            onBack={() => setCurrentStep(1)}
             onSave={handleSave}
           />
         )}
 
-        {currentStep === 4 && (
+        {currentStep === 3 && (
           <StepHistory
             evaluations={savedEvaluations}
             onNew={handleNew}

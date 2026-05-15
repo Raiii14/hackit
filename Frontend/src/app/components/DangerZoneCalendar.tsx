@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
 import {
+  addMonths,
   startOfMonth,
   endOfMonth,
   eachDayOfInterval,
@@ -7,8 +9,11 @@ import {
   format,
   isSameDay,
   isToday,
+  isSameMonth,
+  subMonths,
   differenceInCalendarDays,
 } from "date-fns";
+import { ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
 
 interface DangerZoneCalendarProps {
   dueDate: string; // "YYYY-MM-DD"
@@ -19,12 +24,17 @@ const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export function DangerZoneCalendar({ dueDate, breakingPoint }: DangerZoneCalendarProps) {
   const due = new Date(dueDate + "T00:00:00");
+  const [visibleMonth, setVisibleMonth] = useState(() => startOfMonth(due));
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const monthStart = startOfMonth(due);
-  const monthEnd = endOfMonth(due);
-  const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
+  useEffect(() => {
+    setVisibleMonth(startOfMonth(due));
+  }, [dueDate]);
+
+  const monthStart = startOfMonth(visibleMonth);
+  const visibleMonthEnd = endOfMonth(visibleMonth);
+  const days = eachDayOfInterval({ start: monthStart, end: visibleMonthEnd });
   const startPad = getDay(monthStart);
 
   const daysUntilDue = differenceInCalendarDays(due, today);
@@ -76,9 +86,39 @@ export function DangerZoneCalendar({ dueDate, breakingPoint }: DangerZoneCalenda
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
-        <span style={{ fontWeight: 600, color: "#374151" }}>
-          {format(due, "MMMM yyyy")}
-        </span>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setVisibleMonth((current) => subMonths(current, 1))}
+            aria-label="Previous month"
+            className="w-8 h-8 rounded-lg flex items-center justify-center"
+            style={{ border: "1px solid #e5e7eb", backgroundColor: "white", cursor: "pointer" }}
+          >
+            <ChevronLeft size={15} color="#6b7280" />
+          </button>
+          <button
+            onClick={() => setVisibleMonth(startOfMonth(due))}
+            className="px-3 h-8 rounded-lg flex items-center gap-2"
+            style={{
+              border: "1px solid #e5e7eb",
+              backgroundColor: isSameMonth(visibleMonth, due) ? "#eff6ff" : "white",
+              cursor: "pointer",
+              color: isSameMonth(visibleMonth, due) ? "#1d4ed8" : "#374151",
+              fontWeight: 700,
+              fontSize: "0.78rem",
+            }}
+          >
+            <CalendarDays size={14} />
+            {format(visibleMonth, "MMM yyyy")}
+          </button>
+          <button
+            onClick={() => setVisibleMonth((current) => addMonths(current, 1))}
+            aria-label="Next month"
+            className="w-8 h-8 rounded-lg flex items-center justify-center"
+            style={{ border: "1px solid #e5e7eb", backgroundColor: "white", cursor: "pointer" }}
+          >
+            <ChevronRight size={15} color="#6b7280" />
+          </button>
+        </div>
         <span
           style={{
             fontSize: "0.72rem",
