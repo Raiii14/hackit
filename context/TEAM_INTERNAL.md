@@ -17,9 +17,10 @@ Keep this file public-safe if it is committed to `origin/main`. Do not put secre
 
 - Ship the LoanWise pitch prototype from `Frontend/`.
 - Keep the demo loop sharp: `Landing -> Baseline -> Verdict -> History`.
-- Merge evaluation and stress into one verdict surface.
+- AI chatbot path is live (`context/AI_CHAT_IMPLEMENTATION.md`); next UX focus is merged Verdict.
+- Merge evaluation and stress into one verdict surface after the minimal AI path is stable.
 - Make the pitch moment visible in one gesture: baseline looks manageable, stress exposes risk.
-- Keep Supabase, AI, export, and named scenario research behind the core demo loop.
+- Keep export and named scenario research behind the core demo loop.
 
 ## Frontend Coordination
 
@@ -28,7 +29,8 @@ Use four working lanes:
 | Lane | Owns |
 |---|---|
 | Verdict UX | Merged verdict, stress controls, status, true cost, safer path |
-| Baseline UX | Six inputs, sample fill, optional cash-left estimator |
+| Baseline UX | Six inputs, direct CTA, optional cash-left estimator |
+| AI Chatbot | Supabase Edge Function, guest frontend call, guarded result explanation |
 | History | Save, reload, delete, localStorage persistence |
 | Pitch Polish | Demo numbers, disclaimer, copy, 60-second walkthrough |
 
@@ -36,6 +38,7 @@ Rules:
 
 - PRs should name their lane.
 - Do not duplicate formulas in components.
+- AI may explain computed results, but must not approve loans, invent rates, or act as financial advice.
 - Do not make named scenario claims without evidence or an `illustrative` label.
 - Do not let optional features block the guest demo.
 - If two teammates touch the same component, agree on ownership first.

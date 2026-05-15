@@ -90,6 +90,13 @@ Why: The team requested a one-shot localhost prototype now, with Supabase accoun
 Impact: Guest mode must remain fully usable without Supabase credentials. Account features should degrade gracefully until `.env.local` is configured, and Vercel deployment should use standard Vite environment variables.
 Status: active
 
+## 2026-05-16
+
+Decision: Use Supabase Edge Function `chat` plus Vertex AI (`gemini-2.5-flash`) for guest result explanation; keep Google credentials in Supabase secrets only.
+Why: Matches the proven ClearStack pattern, keeps secrets off the browser, and fits the hackathon guest demo without login.
+Impact: Frontend uses legacy anon JWT (`eyJ...`) to call `/functions/v1/chat`. Setup and known pitfalls live in `context/AI_CHAT_IMPLEMENTATION.md`. AI explains computed `loanContext` only; it must not approve loans or invent rates.
+Status: active
+
 ## 2026-05-14
 
 Decision: Include saved loan history and dashboard tables in the prototype while keeping persistence local-first.

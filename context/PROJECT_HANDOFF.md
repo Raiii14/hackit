@@ -14,17 +14,19 @@ Working:
 - `Frontend/` is the canonical app for the pitch prototype.
 - Loan math belongs in `Frontend/src/lib/loanLogic.ts` and `Frontend/src/lib/evaluation.ts`.
 - Guest mode, six core inputs, generic percentage-drop testing, and local-first history remain active constraints.
+- **AI chatbot is live:** `supabase/functions/chat` deployed on project `puoaptudxlejbloijhvu`; `LoanWiseChat` on Verdict/Stress steps returns Vertex replies for guest users.
+- Setup and pitfalls documented in `context/AI_CHAT_IMPLEMENTATION.md`.
+- `loanwise-ai.json` is a local Google service-account credential and is ignored by Git.
 
 In progress:
 
-- Frontend execution planning is being simplified around `context/TEAM_PLAN_LEAN.md`.
-- The main frontend UX focus is `Baseline -> Verdict -> History`, with evaluation and stress merged into one verdict surface.
-- Root `src/` is legacy/archive-only after needed logic is ported.
+- Merged `Verdict` UX (evaluation + stress in one surface) per `context/TEAM_PLAN_LEAN.md`.
+- AI reply token cap is raised locally to `1200`; redeploy `supabase/functions/chat` before expecting the hosted function to stop truncating longer replies.
 
 Blocked:
 
 - Named real-world scenario chips need evidence or an `illustrative` label before being presented as anything more than examples.
-- Supabase-dependent flows are not required for the pitch demo and should not block guest mode.
+- Public anon access to the chat function is not abuse-proof without rate limits.
 
 ## Source Owners
 
@@ -35,6 +37,7 @@ Before updating this file, check whether the new fact belongs somewhere else:
 | Official event rules, dates, deliverables, judging criteria | `guidelines.md` |
 | Stable project behavior and working rules | `context/PROJECT_GUIDE.md` |
 | Durable decisions that affect future work | `context/DECISIONS.md` |
+| AI setup, secrets, and debugging | `context/AI_CHAT_IMPLEMENTATION.md` |
 | Active feature scope | `features.md` |
 | Product flow, inputs, and formulas | `systemflow.md` |
 | Visual design rules | `DESIGN.md` |
@@ -55,17 +58,25 @@ Before ending meaningful work or opening a PR:
 
 ## Last Meaningful Changes
 
-- `context/PROJECT_HANDOFF.md` replaces the old session-closeout template as the project continuity and PR closeout file.
-- `context/TEAM_PLAN_LEAN.md` is the compact frontend coordination plan for teammates.
-- `context/TEAM_INTERNAL.md` is the project-specific internal coordination and safety runbook.
+- Minimal AI path shipped: Supabase Edge Function `chat` + Vertex `gemini-2.5-flash` + `LoanWiseChat` guest flow.
+- Fixed corrupted `GOOGLE_SERVICE_ACCOUNT_JSON` secret (JSON + trailing `VERTEX_*` on one line).
+- Aligned Vertex config with ClearStack pattern (`us-central1`, explicit `VERTEX_PROJECT_ID`).
+- Added `context/AI_CHAT_IMPLEMENTATION.md` for setup, mistakes, and rationale.
 
 ## Risks Or Stale Facts
 
-- `context/FRONTEND_TEAM_PLAN.md` is longer than the lean plan and may be stale as an execution guide.
-- Any named scenario such as rainy week, sickness, or late payments needs evidence in a scenario evidence doc or must be labeled illustrative.
+- `context/FRONTEND_TEAM_PLAN.md` may be stale; prefer `context/TEAM_PLAN_LEAN.md`.
+- Named scenarios need evidence or `illustrative` labeling.
+- Do not put Vertex env vars on the same line as Google JSON when setting Supabase secrets.
 
 ## Next Focus
 
-1. Share `context/TEAM_PLAN_LEAN.md` with teammates as the short frontend coordination plan.
-2. Implement the merged `Verdict` step in `Frontend/`.
-3. Add sample-fill demo data and localStorage-backed history after the verdict loop works.
+1. Redeploy `supabase/functions/chat` so the `maxOutputTokens: 1200` change reaches the hosted function.
+2. Continue merged **Verdict** step UX (`Baseline -> Verdict -> History`).
+3. Pitch polish and 60-second demo walkthrough.
+
+## Verification
+
+- Verified: `chat` deployed and ACTIVE on `puoaptudxlejbloijhvu`; POST with anon JWT returns `{ reply }`.
+- Verified: App **Ask AI** flow works after secret fix and deploy.
+- Not verified: rate limiting, production Vercel env vars, function redeploy after token-cap change, or longer reply quality after redeploy.

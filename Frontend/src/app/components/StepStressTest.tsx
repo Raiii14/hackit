@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Button } from "./ui/button";
 import { CashHealthGauge } from "./CashHealthGauge";
 import { DangerZoneCalendar } from "./DangerZoneCalendar";
+import { LoanWiseChat } from "./LoanWiseChat";
 import {
   ArrowLeft,
   Save,
@@ -127,11 +128,16 @@ export function StepStressTest({
         className="rounded-2xl p-5"
         style={{ background: "linear-gradient(135deg, #4c1d95 0%, #6d28d9 100%)" }}
       >
-        <h2 style={{ color: "white", marginBottom: 4 }}>Step 3: Stress Test</h2>
-        <p style={{ color: "#ddd6fe", fontSize: "0.87rem" }}>
-          Simulate income drops to find your exact financial breaking point. Drag the
-          slider to see how your cash health changes in real-time.
-        </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 style={{ color: "white", marginBottom: 4 }}>Step 3: Stress Test</h2>
+            <p style={{ color: "#ddd6fe", fontSize: "0.87rem" }}>
+              Simulate income drops to find your exact financial breaking point. Drag the
+              slider to see how your cash health changes in real-time.
+            </p>
+          </div>
+          <LoanWiseChat inputs={inputs} result={result} contextLabel="stressed verdict" />
+        </div>
       </div>
 
       {/* Slider + Live Gauge */}

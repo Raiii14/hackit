@@ -28,7 +28,17 @@ npm run lint
 npm run build
 ```
 
-Supabase is intentionally optional for localhost. Guest mode and browser-saved history work without credentials. To enable accounts later, create `.env.local` from `.env.example`, add the Supabase project URL and anon key, then run `supabase/schema.sql` in the Supabase SQL editor.
+Supabase is intentionally optional for the basic localhost flow. Guest mode and browser-saved history work without credentials. To enable the AI chatbot or accounts, create `Frontend/.env.local` from `Frontend/.env.example` and add the Supabase project URL and anon key.
+
+The AI chatbot uses a Supabase Edge Function so the browser never sees the AI service-account credential. `loanwise-ai.json` is a local secret and must stay ignored by Git. For local function testing, create `supabase/functions/.env.local` from that JSON and run:
+
+```powershell
+supabase functions serve chat --env-file supabase/functions/.env.local
+```
+
+For deployment, set secrets separately (do not put Vertex vars on the same line as the Google JSON), then deploy. See `supabase/functions/chat/README.md`.
+
+To enable saved account-backed history later, run `supabase/schema.sql` in the Supabase SQL editor.
 
 The app is ready for Vercel deployment as a standard Vite project. Add the same `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` values in Vercel project environment variables before deploying auth-enabled builds.
 
@@ -54,6 +64,7 @@ The app is ready for Vercel deployment as a standard Vite project. Add the same 
 - `context/DECISIONS.md` - stable decisions that affect later work.
 - `context/PROJECT_HANDOFF.md` - current continuity, risks, next focus, and closeout checklist.
 - `supabase/schema.sql` - optional Supabase table and row-level-security setup for saved loan checks.
+- `supabase/functions/chat` - guest-callable AI chatbot backend.
 
 ## Collaboration Rule
 

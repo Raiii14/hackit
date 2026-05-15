@@ -1,5 +1,6 @@
 import { Button } from "./ui/button";
 import { CashHealthGauge } from "./CashHealthGauge";
+import { LoanWiseChat } from "./LoanWiseChat";
 import {
   ArrowLeft,
   ArrowRight,
@@ -160,10 +161,11 @@ export function StepEvaluation({ inputs, result, onBack, onNext }: Props) {
         style={{ background: statusBannerBg }}
       >
         <StatusIcon size={24} color="white" style={{ flexShrink: 0, marginTop: 2 }} />
-        <div>
+        <div className="flex-1">
           <h2 style={{ color: "white", marginBottom: 4 }}>Step 2: Offer Evaluation</h2>
           <p style={{ color: "rgba(255,255,255,0.8)", fontSize: "0.87rem" }}>{statusMsg}</p>
         </div>
+        <LoanWiseChat inputs={inputs} result={result} contextLabel="baseline verdict" />
       </div>
 
       {/* Gauge + Cost Breakdown */}
