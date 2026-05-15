@@ -8,9 +8,8 @@ interface StepIndicatorProps {
 
 const STEPS = [
   { num: 1, label: "Baseline Inputs" },
-  { num: 2, label: "Offer Evaluation" },
-  { num: 3, label: "Stress Test" },
-  { num: 4, label: "History" },
+  { num: 2, label: "Verdict" },
+  { num: 3, label: "History" },
 ];
 
 export function StepIndicator({ currentStep, canNavigate, onStepClick }: StepIndicatorProps) {
