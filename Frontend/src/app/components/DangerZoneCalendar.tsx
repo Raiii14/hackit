@@ -14,10 +14,11 @@ import {
   differenceInCalendarDays,
 } from "date-fns";
 import { ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
+import { theme } from "../../lib/theme";
 
 interface DangerZoneCalendarProps {
-  dueDate: string; // "YYYY-MM-DD"
-  breakingPoint: number; // % income drop where cash fails
+  dueDate: string;
+  breakingPoint: number;
 }
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -44,16 +45,16 @@ export function DangerZoneCalendar({ dueDate, breakingPoint }: DangerZoneCalenda
   function getDayStyle(day: Date): CSSProperties {
     if (isSameDay(day, due)) {
       return {
-        backgroundColor: "#dc2626",
-        color: "white",
+        backgroundColor: theme.danger,
+        color: theme.canvas,
         borderRadius: "50%",
         fontWeight: 700,
       };
     }
     if (isToday(day)) {
       return {
-        backgroundColor: "#2563eb",
-        color: "white",
+        backgroundColor: theme.ink,
+        color: theme.canvas,
         borderRadius: "50%",
         fontWeight: 700,
       };
@@ -61,16 +62,16 @@ export function DangerZoneCalendar({ dueDate, breakingPoint }: DangerZoneCalenda
     const diffFromDue = differenceInCalendarDays(due, day);
     if (diffFromDue > 0 && diffFromDue <= 3 && day >= today) {
       return {
-        backgroundColor: "#fef2f2",
-        color: "#dc2626",
+        backgroundColor: "#FDECEC",
+        color: theme.danger,
         borderRadius: "50%",
         fontWeight: 600,
       };
     }
     if (diffFromDue > 3 && diffFromDue <= 7 && day >= today) {
       return {
-        backgroundColor: "#fff7ed",
-        color: "#c2410c",
+        backgroundColor: "#FFF6E8",
+        color: theme.rust,
         borderRadius: "50%",
       };
     }
@@ -90,19 +91,19 @@ export function DangerZoneCalendar({ dueDate, breakingPoint }: DangerZoneCalenda
           <button
             onClick={() => setVisibleMonth((current) => subMonths(current, 1))}
             aria-label="Previous month"
-            className="w-8 h-8 rounded-lg flex items-center justify-center"
-            style={{ border: "1px solid #e5e7eb", backgroundColor: "white", cursor: "pointer" }}
+            className="w-8 h-8 rounded-full flex items-center justify-center"
+            style={{ border: `1px solid ${theme.line}`, backgroundColor: theme.white, cursor: "pointer" }}
           >
-            <ChevronLeft size={15} color="#6b7280" />
+            <ChevronLeft size={15} color={theme.slate} />
           </button>
           <button
             onClick={() => setVisibleMonth(startOfMonth(due))}
-            className="px-3 h-8 rounded-lg flex items-center gap-2"
+            className="px-3 h-8 rounded-full flex items-center gap-2"
             style={{
-              border: "1px solid #e5e7eb",
-              backgroundColor: isSameMonth(visibleMonth, due) ? "#eff6ff" : "white",
+              border: `1px solid ${theme.line}`,
+              backgroundColor: isSameMonth(visibleMonth, due) ? "#EFEAE5" : theme.white,
               cursor: "pointer",
-              color: isSameMonth(visibleMonth, due) ? "#1d4ed8" : "#374151",
+              color: isSameMonth(visibleMonth, due) ? theme.ink : theme.charcoal,
               fontWeight: 700,
               fontSize: "0.78rem",
             }}
@@ -113,31 +114,30 @@ export function DangerZoneCalendar({ dueDate, breakingPoint }: DangerZoneCalenda
           <button
             onClick={() => setVisibleMonth((current) => addMonths(current, 1))}
             aria-label="Next month"
-            className="w-8 h-8 rounded-lg flex items-center justify-center"
-            style={{ border: "1px solid #e5e7eb", backgroundColor: "white", cursor: "pointer" }}
+            className="w-8 h-8 rounded-full flex items-center justify-center"
+            style={{ border: `1px solid ${theme.line}`, backgroundColor: theme.white, cursor: "pointer" }}
           >
-            <ChevronRight size={15} color="#6b7280" />
+            <ChevronRight size={15} color={theme.slate} />
           </button>
         </div>
         <span
           style={{
             fontSize: "0.72rem",
             fontWeight: 600,
-            padding: "2px 8px",
+            padding: "4px 10px",
             borderRadius: 999,
-            backgroundColor: isHighRisk ? "#fee2e2" : isMediumRisk ? "#fef3c7" : "#dcfce7",
-            color: isHighRisk ? "#dc2626" : isMediumRisk ? "#92400e" : "#15803d",
+            backgroundColor: isHighRisk ? "#FDECEC" : isMediumRisk ? "#FFF6E8" : "#E7F3EA",
+            color: isHighRisk ? theme.danger : isMediumRisk ? theme.amber : theme.green,
           }}
         >
           {daysUntilDue > 0
             ? `Due in ${daysUntilDue} day${daysUntilDue === 1 ? "" : "s"}`
             : daysUntilDue === 0
-            ? "Due Today!"
-            : "Overdue"}
+              ? "Due today"
+              : "Overdue"}
         </span>
       </div>
 
-      {/* Day headers */}
       <div className="grid grid-cols-7 gap-0.5 mb-1">
         {DAYS.map((d) => (
           <div
@@ -146,7 +146,7 @@ export function DangerZoneCalendar({ dueDate, breakingPoint }: DangerZoneCalenda
               textAlign: "center",
               fontSize: "0.65rem",
               fontWeight: 600,
-              color: "#9ca3af",
+              color: theme.slate,
               paddingBottom: 4,
             }}
           >
@@ -155,7 +155,6 @@ export function DangerZoneCalendar({ dueDate, breakingPoint }: DangerZoneCalenda
         ))}
       </div>
 
-      {/* Day grid */}
       <div className="grid grid-cols-7 gap-0.5">
         {Array.from({ length: startPad }).map((_, i) => (
           <div key={`pad-${i}`} />
@@ -194,16 +193,15 @@ export function DangerZoneCalendar({ dueDate, breakingPoint }: DangerZoneCalenda
         })}
       </div>
 
-      {/* Legend */}
       <div className="flex flex-wrap gap-3 mt-3">
         {[
-          { color: "#2563eb", label: "Today" },
-          { color: "#dc2626", label: "Due Date" },
-          { color: "#f97316", label: "Danger Days (within 7 days)" },
+          { color: theme.ink, label: "Today" },
+          { color: theme.danger, label: "Due date" },
+          { color: theme.orange, label: "Danger days (within 7 days)" },
         ].map(({ color, label }) => (
           <div key={label} className="flex items-center gap-1">
             <div style={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: color }} />
-            <span style={{ fontSize: "0.65rem", color: "#6b7280" }}>{label}</span>
+            <span style={{ fontSize: "0.65rem", color: theme.slate }}>{label}</span>
           </div>
         ))}
       </div>

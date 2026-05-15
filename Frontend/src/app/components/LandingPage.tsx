@@ -13,25 +13,14 @@ import {
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { CashHealthGauge } from "./CashHealthGauge";
+import { AppNavbar } from "./AppNavbar";
+import { theme } from "../../lib/theme";
 
 interface LandingPageProps {
   onStartTest: () => void;
   onUseAccount: () => void;
   savedCount: number;
 }
-
-const theme = {
-  canvas: "#F3F0EE",
-  paper: "#FCFBFA",
-  ink: "#141413",
-  charcoal: "#262627",
-  slate: "#696969",
-  line: "#D1CDC7",
-  orange: "#F37338",
-  rust: "#CF4500",
-  green: "#168345",
-  amber: "#9A5A00",
-};
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -162,99 +151,12 @@ export function LandingPage({
           }}
         />
         <div className="relative z-10 max-w-6xl mx-auto px-5">
-          <header
-            className="flex items-center justify-between gap-4"
-            style={{
-              padding: "24px 0 20px",
-              borderBottom: "1px solid rgba(243,240,238,0.16)",
-            }}
-          >
-            <button
-              onClick={onStartTest}
-              className="flex items-center gap-3"
-              style={{
-                background: "transparent",
-                border: 0,
-                color: theme.canvas,
-                cursor: "pointer",
-                padding: 0,
-              }}
-            >
-              <span
-                className="w-10 h-10 rounded-full flex items-center justify-center"
-                style={{
-                  background: theme.canvas,
-                  color: theme.ink,
-                }}
-              >
-                <Shield size={18} />
-              </span>
-              <span style={{ textAlign: "left" }}>
-                <span
-                  style={{
-                    display: "block",
-                    color: theme.canvas,
-                    fontSize: "1.12rem",
-                    fontWeight: 700,
-                    lineHeight: 1,
-                    letterSpacing: 0,
-                  }}
-                >
-                  LoanWise
-                </span>
-                <span
-                  style={{
-                    display: "block",
-                    color: "rgba(243,240,238,0.62)",
-                    fontSize: "0.66rem",
-                    lineHeight: 1.2,
-                    marginTop: 4,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.08em",
-                  }}
-                >
-                  Repayment Stress Simulator
-                </span>
-              </span>
-            </button>
-
-            <nav className="flex items-center gap-5" aria-label="Landing page actions">
-              {savedCount > 0 && (
-                <button
-                  onClick={onUseAccount}
-                  className="hidden sm:flex items-center gap-1.5"
-                  style={{
-                    background: "transparent",
-                    border: 0,
-                    color: "rgba(243,240,238,0.72)",
-                    cursor: "pointer",
-                    fontSize: "0.92rem",
-                    fontWeight: 500,
-                    padding: 0,
-                  }}
-                >
-                  <BookmarkCheck size={15} />
-                  History ({savedCount})
-                </button>
-              )}
-              <button
-                onClick={onUseAccount}
-                className="flex items-center gap-1.5"
-                style={{
-                  background: "transparent",
-                  border: 0,
-                  color: theme.canvas,
-                  cursor: "pointer",
-                  fontSize: "0.92rem",
-                  fontWeight: 500,
-                  padding: 0,
-                }}
-              >
-                <Lock size={14} />
-                Use account
-              </button>
-            </nav>
-          </header>
+          <AppNavbar
+            onLogoClick={onStartTest}
+            savedCount={savedCount}
+            onHistoryClick={onUseAccount}
+            onAccountClick={onUseAccount}
+          />
 
           <div
             className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-10 items-center"

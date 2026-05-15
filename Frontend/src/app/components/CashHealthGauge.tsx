@@ -60,7 +60,7 @@ export function CashHealthGauge({ score, size = 280 }: CashHealthGaugeProps) {
   return (
     <svg width={size} height={svgH} viewBox={`0 0 ${size} ${svgH}`}>
       {/* Background */}
-      <path d={arcD(180, 360)} fill="none" stroke="#e2e8f0" strokeWidth={sw} strokeLinecap="butt" />
+      <path d={arcD(180, 360)} fill="none" stroke="#D1CDC7" strokeWidth={sw} strokeLinecap="butt" />
 
       {/* Red zone: 180–240 */}
       <path
@@ -124,7 +124,7 @@ export function CashHealthGauge({ score, size = 280 }: CashHealthGaugeProps) {
       </text>
       <text
         x={cx} y={cy + sw * 0.5 + 40}
-        textAnchor="middle" fill="#6b7280"
+        textAnchor="middle" fill="#696969"
         fontSize={size * 0.037}
       >
         Score: {Math.round(clampedScore)} / 100

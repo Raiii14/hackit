@@ -34,6 +34,8 @@ import {
 } from "recharts";
 import type { LoanInputs, EvaluationResult } from "../App";
 import type { LucideIcon } from "lucide-react";
+import { theme, cardFlat, pillButton, pillButtonOutline, statusColors } from "../../lib/theme";
+import { StepHeader } from "./StepHeader";
 
 interface Props {
   inputs: LoanInputs;
@@ -57,13 +59,13 @@ function MetricRow({
   color?: string;
 }) {
   return (
-    <div className="flex items-center justify-between py-2.5" style={{ borderBottom: "1px solid #f3f4f6" }}>
-      <span style={{ color: "#6b7280", fontSize: "0.85rem" }}>{label}</span>
+    <div className="flex items-center justify-between py-2.5" style={{ borderBottom: `1px solid ${theme.line}` }}>
+      <span style={{ color: theme.slate, fontSize: "0.85rem" }}>{label}</span>
       <div className="text-right">
         <span style={{ color: color || "#111827", fontWeight: 600, fontSize: "0.9rem" }}>
           {value}
         </span>
-        {sub && <div style={{ color: "#9ca3af", fontSize: "0.72rem" }}>{sub}</div>}
+        {sub && <div style={{ color: theme.slate, fontSize: "0.72rem" }}>{sub}</div>}
       </div>
     </div>
   );
@@ -96,7 +98,7 @@ function CashRow({
       }}
     >
       <div className="flex items-center justify-between mb-3">
-        <span style={{ fontWeight: 600, color: "#374151", fontSize: "0.85rem" }}>
+        <span style={{ fontWeight: 600, color: theme.charcoal, fontSize: "0.85rem" }}>
           {isBad ? "Bad day" : "Normal day"}
         </span>
         {isNeg || marginBad ? (
@@ -107,13 +109,13 @@ function CashRow({
       </div>
       <div className="space-y-1.5">
         <div className="flex justify-between">
-          <span style={{ fontSize: "0.78rem", color: "#6b7280" }}>{label}</span>
-          <span style={{ fontSize: "0.78rem", fontWeight: 600, color: "#374151" }}>
+          <span style={{ fontSize: "0.78rem", color: theme.slate }}>{label}</span>
+          <span style={{ fontSize: "0.78rem", fontWeight: 600, color: theme.charcoal }}>
             PHP {fmt(available)}
           </span>
         </div>
         <div className="flex justify-between">
-          <span style={{ fontSize: "0.78rem", color: "#6b7280" }}>After repayment</span>
+          <span style={{ fontSize: "0.78rem", color: theme.slate }}>After repayment</span>
           <span
             style={{
               fontSize: "0.78rem",
@@ -125,7 +127,7 @@ function CashRow({
           </span>
         </div>
         <div className="flex justify-between">
-          <span style={{ fontSize: "0.78rem", color: "#6b7280" }}>vs. buffer</span>
+          <span style={{ fontSize: "0.78rem", color: theme.slate }}>vs. buffer</span>
           <span
             style={{
               fontSize: "0.78rem",
@@ -205,9 +207,9 @@ const STRESS_SCENARIOS: StressScenario[] = [
     detail: "0% drop",
     level: 0,
     icon: RotateCcw,
-    color: "#2563eb",
-    bg: "#eff6ff",
-    border: "#bfdbfe",
+    color: theme.ink,
+    bg: "#EFEAE5",
+    border: theme.line,
   },
   {
     id: "slow-sales",
@@ -324,11 +326,7 @@ export function StepStressTest({
 
   const saferSuggestion = result.saferLoanAmount;
   const canSuggestSafer = saferSuggestion < inputs.loanAmount * 0.95 && saferSuggestion > 0;
-  const statusBannerBg = {
-    green: "linear-gradient(135deg, #14532d 0%, #15803d 100%)",
-    yellow: "linear-gradient(135deg, #78350f 0%, #92400e 100%)",
-    red: "linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%)",
-  }[healthStatus];
+  const statusCfg = statusColors[healthStatus];
   const statusMsg = {
     green: "The baseline looks manageable. Use the stress controls below to test whether it survives a bad month.",
     yellow: "The baseline is already tight. Stress testing shows how quickly the cash buffer can break.",
@@ -342,38 +340,50 @@ export function StepStressTest({
 
   return (
     <div className="space-y-5">
-      <div
-        className="rounded-2xl p-5 flex items-start gap-4"
-        style={{ background: statusBannerBg }}
-      >
-        <StatusIcon size={24} color="white" style={{ flexShrink: 0, marginTop: 2 }} />
-        <div>
-          <h2 style={{ color: "white", marginBottom: 4 }}>Step 2: Verdict</h2>
-          <p style={{ color: "rgba(255,255,255,0.82)", fontSize: "0.87rem" }}>{statusMsg}</p>
-        </div>
-      </div>
+      <StepHeader
+        eyebrow="Step 2"
+        title="Verdict"
+        description={statusMsg}
+        action={
+          <span
+            className="inline-flex items-center gap-1.5"
+            style={{
+              background: statusCfg.bg,
+              border: `1px solid ${statusCfg.border}`,
+              color: statusCfg.text,
+              borderRadius: 999,
+              fontSize: "0.76rem",
+              fontWeight: 700,
+              padding: "6px 12px",
+              flexShrink: 0,
+            }}
+          >
+            <StatusIcon size={14} />
+            {healthStatus === "green" ? "Manageable" : healthStatus === "yellow" ? "Caution" : "High risk"}
+          </span>
+        }
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div
-          className="bg-white rounded-2xl p-5 shadow-sm flex flex-col items-center"
-          style={{ border: "1px solid #f1f5f9" }}
+          className="p-5 flex flex-col items-center"
+          style={cardFlat}
         >
-          <h3 style={{ color: "#111827", marginBottom: 2, alignSelf: "flex-start" }}>
-            Baseline Cash Health
+          <h3 style={{ color: theme.ink, marginBottom: 2, alignSelf: "flex-start" }}>
+            Baseline cash health
           </h3>
-          <p style={{ color: "#6b7280", fontSize: "0.78rem", marginBottom: 12, alignSelf: "flex-start" }}>
+          <p style={{ color: theme.slate, fontSize: "0.78rem", marginBottom: 12, alignSelf: "flex-start" }}>
             Before stress is applied
           </p>
           <CashHealthGauge score={baselineResult.healthScore} size={230} />
         </div>
 
         <div
-          className="bg-white rounded-2xl p-5 shadow-sm"
-          style={{ border: "1px solid #f1f5f9" }}
+          className="p-5" style={cardFlat}
         >
           <div className="flex items-center gap-2 mb-4">
             <TrendingDown size={16} color="#6b7280" />
-            <h3 style={{ color: "#111827" }}>True Cost of Borrowing</h3>
+            <h3 style={{ color: theme.ink }}>True Cost of Borrowing</h3>
           </div>
           <MetricRow label="You borrow" value={`PHP ${fmt(inputs.loanAmount)}`} />
           <MetricRow label="You repay" value={`PHP ${fmt(inputs.repaymentAmount)}`} />
@@ -400,12 +410,11 @@ export function StepStressTest({
       </div>
 
       <div
-        className="bg-white rounded-2xl p-5 shadow-sm"
-        style={{ border: "1px solid #f1f5f9" }}
+        className="p-5" style={cardFlat}
       >
         <div className="flex items-center gap-2 mb-4">
           <Clock size={16} color="#6b7280" />
-          <h3 style={{ color: "#111827" }}>Baseline Cash Flow After Repayment</h3>
+          <h3 style={{ color: theme.ink }}>Baseline Cash Flow After Repayment</h3>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <CashRow
@@ -429,14 +438,13 @@ export function StepStressTest({
       {/* Scenario buttons + Slider + Live Gauge */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div
-          className="bg-white rounded-2xl p-5 shadow-sm"
-          style={{ border: "1px solid #f1f5f9" }}
+          className="p-5" style={cardFlat}
         >
           <div className="flex items-center gap-2 mb-2">
-            <Zap size={16} color="#7c3aed" />
-            <h3 style={{ color: "#111827" }}>Income Drop Simulator</h3>
+            <Zap size={16} color={theme.rust} />
+            <h3 style={{ color: theme.ink }}>Income Drop Simulator</h3>
           </div>
-          <p style={{ color: "#6b7280", fontSize: "0.78rem", marginBottom: 14 }}>
+          <p style={{ color: theme.slate, fontSize: "0.78rem", marginBottom: 14 }}>
             Choose a scenario or set a manual income drop.
           </p>
 
@@ -490,7 +498,7 @@ export function StepStressTest({
           {/* Slider */}
           <div className="mb-5">
             <div className="flex justify-between mb-2">
-              <span style={{ fontSize: "0.8rem", color: "#6b7280" }}>Low {stressLow}%</span>
+              <span style={{ fontSize: "0.8rem", color: theme.slate }}>Low {stressLow}%</span>
               <span
                 style={{
                   fontSize: "1.1rem",
@@ -500,7 +508,7 @@ export function StepStressTest({
               >
                 {stressLow}% - {stressHigh}% drop
               </span>
-              <span style={{ fontSize: "0.8rem", color: "#6b7280" }}>High {stressHigh}%</span>
+              <span style={{ fontSize: "0.8rem", color: theme.slate }}>High {stressHigh}%</span>
             </div>
 
             <div className="space-y-3">
@@ -509,7 +517,7 @@ export function StepStressTest({
                 style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0" }}
               >
                 <div className="flex items-center justify-between mb-1.5">
-                  <span style={{ fontSize: "0.74rem", fontWeight: 700, color: "#6b7280" }}>
+                  <span style={{ fontSize: "0.74rem", fontWeight: 700, color: theme.slate }}>
                     Low drop
                   </span>
                   <span style={{ fontSize: "0.76rem", fontWeight: 800, color: "#7c3aed" }}>
@@ -537,7 +545,7 @@ export function StepStressTest({
                 style={{ backgroundColor: isPastBreaking ? "#fef2f2" : "#f5f3ff", border: `1px solid ${isPastBreaking ? "#fecaca" : "#ddd6fe"}` }}
               >
                 <div className="flex items-center justify-between mb-1.5">
-                  <span style={{ fontSize: "0.74rem", fontWeight: 700, color: "#6b7280" }}>
+                  <span style={{ fontSize: "0.74rem", fontWeight: 700, color: theme.slate }}>
                     High drop used for live result
                   </span>
                   <span style={{ fontSize: "0.76rem", fontWeight: 800, color: isPastBreaking ? "#dc2626" : "#7c3aed" }}>
@@ -567,7 +575,7 @@ export function StepStressTest({
                 style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0" }}
               >
                 <SlidersHorizontal size={14} color="#6b7280" />
-                <span style={{ fontSize: "0.74rem", color: "#6b7280" }}>
+                <span style={{ fontSize: "0.74rem", color: theme.slate }}>
                   {activeScenario
                     ? `${activeScenario.label} applied`
                     : "Manual range applied"}; live score uses high drop.
@@ -589,7 +597,7 @@ export function StepStressTest({
                   border: "1px solid #d1d5db",
                   borderRadius: 8,
                   padding: "8px 10px",
-                  color: "#374151",
+                  color: theme.charcoal,
                   fontWeight: 700,
                   fontSize: "0.82rem",
                 }}
@@ -646,7 +654,7 @@ export function StepStressTest({
                   border: `1px solid ${val < inputs.minCashBuffer ? "#fca5a5" : "#f3f4f6"}`,
                 }}
               >
-                <span style={{ fontSize: "0.78rem", color: "#6b7280" }}>{label}</span>
+                <span style={{ fontSize: "0.78rem", color: theme.slate }}>{label}</span>
                 <div className="text-right">
                   <span
                     style={{
@@ -658,7 +666,7 @@ export function StepStressTest({
                     ₱{fmt(val)}
                   </span>
                   {stressLevel > 0 && (
-                    <div style={{ fontSize: "0.68rem", color: "#9ca3af" }}>
+                    <div style={{ fontSize: "0.68rem", color: theme.slate }}>
                       was ₱{fmt(orig)}
                     </div>
                   )}
@@ -670,13 +678,12 @@ export function StepStressTest({
 
         {/* Live Gauge */}
         <div
-          className="bg-white rounded-2xl p-5 shadow-sm flex flex-col items-center"
-          style={{ border: "1px solid #f1f5f9" }}
+          className="p-5 flex flex-col items-center" style={cardFlat}
         >
-          <h3 style={{ color: "#111827", marginBottom: 4, alignSelf: "flex-start" }}>
+          <h3 style={{ color: theme.ink, marginBottom: 4, alignSelf: "flex-start" }}>
             Live Health Score
           </h3>
-          <p style={{ color: "#6b7280", fontSize: "0.78rem", marginBottom: 8, alignSelf: "flex-start" }}>
+          <p style={{ color: theme.slate, fontSize: "0.78rem", marginBottom: 8, alignSelf: "flex-start" }}>
             {stressLevel > 0
               ? `At ${stressLevel}% income drop`
               : "Baseline (no income drop)"}
@@ -688,7 +695,7 @@ export function StepStressTest({
               style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0" }}
             >
               <TrendingDown size={13} color="#6b7280" />
-              <p style={{ fontSize: "0.72rem", color: "#6b7280" }}>
+              <p style={{ fontSize: "0.72rem", color: theme.slate }}>
                 Baseline score: <strong>{Math.round(baselineResult.healthScore)}</strong> →{" "}
                 Stressed score:{" "}
                 <strong
@@ -711,19 +718,18 @@ export function StepStressTest({
 
       {/* Recharts stress line chart */}
       <div
-        className="bg-white rounded-2xl p-5 shadow-sm"
-        style={{ border: "1px solid #f1f5f9" }}
+        className="p-5" style={cardFlat}
       >
-        <h3 style={{ color: "#111827", marginBottom: 4 }}>Cash After Repayment vs. Income Drop</h3>
-        <p style={{ color: "#6b7280", fontSize: "0.78rem", marginBottom: 16 }}>
+        <h3 style={{ color: theme.ink, marginBottom: 4 }}>Cash After Repayment vs. Income Drop</h3>
+        <p style={{ color: theme.slate, fontSize: "0.78rem", marginBottom: 16 }}>
           Dashed line shows your minimum cash buffer
         </p>
         <ResponsiveContainer width="100%" height={200}>
           <AreaChart data={chartData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="normalGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2} />
-                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                <stop offset="5%" stopColor={theme.ink} stopOpacity={0.2} />
+                <stop offset="95%" stopColor={theme.ink} stopOpacity={0} />
               </linearGradient>
               <linearGradient id="badGrad" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#ef4444" stopOpacity={0.18} />
@@ -775,7 +781,7 @@ export function StepStressTest({
             <Area
               type="monotone"
               dataKey="normal"
-              stroke="#3b82f6"
+              stroke={theme.ink}
               strokeWidth={2}
               fill="url(#normalGrad)"
               dot={false}
@@ -792,13 +798,13 @@ export function StepStressTest({
         </ResponsiveContainer>
         <div className="flex gap-4 mt-2">
           {[
-            { color: "#3b82f6", label: "Normal Day cash" },
+            { color: theme.ink, label: "Normal Day cash" },
             { color: "#ef4444", label: "Bad Day cash" },
             { color: "#dc2626", label: "Min. buffer line" },
           ].map(({ color, label }) => (
             <div key={label} className="flex items-center gap-1.5">
               <div style={{ width: 12, height: 3, backgroundColor: color, borderRadius: 2 }} />
-              <span style={{ fontSize: "0.7rem", color: "#6b7280" }}>{label}</span>
+              <span style={{ fontSize: "0.7rem", color: theme.slate }}>{label}</span>
             </div>
           ))}
         </div>
@@ -807,10 +813,9 @@ export function StepStressTest({
       {/* Danger Zone Calendar + Safer Borrowing */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div
-          className="bg-white rounded-2xl p-5 shadow-sm"
-          style={{ border: "1px solid #f1f5f9" }}
+          className="p-5" style={cardFlat}
         >
-          <h3 style={{ color: "#111827", marginBottom: 16 }}>⚠️ Danger Zone Calendar</h3>
+          <h3 style={{ color: theme.ink, marginBottom: 16 }}>⚠️ Danger Zone Calendar</h3>
           <DangerZoneCalendar
             dueDate={inputs.dueDate}
             breakingPoint={bp}
@@ -818,10 +823,9 @@ export function StepStressTest({
         </div>
 
         <div
-          className="bg-white rounded-2xl p-5 shadow-sm"
-          style={{ border: "1px solid #f1f5f9" }}
+          className="p-5" style={cardFlat}
         >
-          <h3 style={{ color: "#111827", marginBottom: 12 }}>💡 Safer Borrowing Suggestions</h3>
+          <h3 style={{ color: theme.ink, marginBottom: 12 }}>💡 Safer Borrowing Suggestions</h3>
 
           {canSuggestSafer ? (
             <div className="space-y-3">
@@ -886,12 +890,11 @@ export function StepStressTest({
 
       {/* Financial Micro-Lessons */}
       <div
-        className="bg-white rounded-2xl p-5 shadow-sm"
-        style={{ border: "1px solid #f1f5f9" }}
+        className="p-5" style={cardFlat}
       >
         <div className="flex items-center gap-2 mb-4">
           <BookOpen size={16} color="#374151" />
-          <h3 style={{ color: "#111827" }}>Financial Micro-Lessons</h3>
+          <h3 style={{ color: theme.ink }}>Financial Micro-Lessons</h3>
         </div>
         <div className="space-y-2">
           {LESSONS.map((lesson, i) => (
@@ -912,7 +915,7 @@ export function StepStressTest({
               >
                 <div className="flex items-center gap-2.5">
                   <span style={{ fontSize: "1.1rem" }}>{lesson.icon}</span>
-                  <span style={{ fontWeight: 600, color: "#374151", fontSize: "0.85rem" }}>
+                  <span style={{ fontWeight: 600, color: theme.charcoal, fontSize: "0.85rem" }}>
                     {lesson.title}
                   </span>
                 </div>
@@ -936,14 +939,14 @@ export function StepStressTest({
 
       {/* Navigation */}
       <div className="flex items-center justify-between">
-        <Button variant="outline" onClick={onBack} size="lg">
+        <Button variant="outline" onClick={onBack} size="lg" style={pillButtonOutline}>
           <ArrowLeft size={18} />
           Back
         </Button>
         <Button
           onClick={() => onSave(stressLevel)}
           size="lg"
-          style={{ backgroundColor: "#7c3aed", color: "white" }}
+          style={pillButton}
         >
           <Save size={18} />
           Save Evaluation
