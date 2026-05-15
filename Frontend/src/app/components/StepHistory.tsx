@@ -29,6 +29,8 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import type { SavedEvaluation } from "../App";
+import { theme, cardFlat, pillButton, statusColors } from "../../lib/theme";
+import { StepHeader } from "./StepHeader";
 
 interface Props {
   evaluations: SavedEvaluation[];
@@ -42,9 +44,9 @@ type SortKey = "savedAt" | "label" | "status" | "loanAmount" | "healthScore" | "
 type SortDirection = "asc" | "desc";
 
 const STATUS_CONFIG = {
-  green: { bg: "#f0fdf4", border: "#bbf7d0", dot: "#22c55e", label: "Safe", textColor: "#15803d" },
-  yellow: { bg: "#fffbeb", border: "#fde68a", dot: "#f59e0b", label: "Caution", textColor: "#92400e" },
-  red: { bg: "#fef2f2", border: "#fca5a5", dot: "#ef4444", label: "Danger", textColor: "#991b1b" },
+  green: { ...statusColors.green, label: "Safe", textColor: statusColors.green.text },
+  yellow: { ...statusColors.yellow, label: "Caution", textColor: statusColors.yellow.text },
+  red: { ...statusColors.red, label: "Danger", textColor: statusColors.red.text },
 };
 
 const REPORT_COLUMNS = [
@@ -115,13 +117,13 @@ function buildReportHtml(rows: SavedEvaluation[], title: string) {
   <meta charset="utf-8" />
   <title>${escapeHtml(title)}</title>
   <style>
-    body { font-family: Arial, sans-serif; color: #111827; margin: 28px; }
+    body { font-family: Arial, sans-serif; color: #141413; margin: 28px; background: #F3F0EE; }
     h1 { font-size: 22px; margin: 0 0 4px; }
-    p { color: #4b5563; margin: 0 0 18px; font-size: 12px; }
+    p { color: #696969; margin: 0 0 18px; font-size: 12px; }
     table { border-collapse: collapse; width: 100%; font-size: 11px; }
-    th { background: #0f172a; color: white; text-align: left; padding: 8px; border: 1px solid #334155; }
-    td { padding: 7px 8px; border: 1px solid #d1d5db; vertical-align: top; }
-    tr:nth-child(even) td { background: #f8fafc; }
+    th { background: #141413; color: #F3F0EE; text-align: left; padding: 8px; border: 1px solid #D1CDC7; }
+    td { padding: 7px 8px; border: 1px solid #D1CDC7; vertical-align: top; }
+    tr:nth-child(even) td { background: #FCFBFA; }
     .meta { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
     @media print {
       body { margin: 16px; }
@@ -183,7 +185,7 @@ function SortButton({
       style={{
         background: "none",
         border: "none",
-        color: active ? "#111827" : "#6b7280",
+        color: active ? theme.ink : theme.slate,
         cursor: "pointer",
         fontSize: "0.72rem",
         fontWeight: 700,
@@ -193,7 +195,7 @@ function SortButton({
       {children}
       <ChevronsUpDown size={12} opacity={active ? 1 : 0.45} />
       {active && (
-        <span style={{ fontSize: "0.65rem", color: "#9ca3af" }}>
+        <span style={{ fontSize: "0.65rem", color: theme.slate }}>
           {direction === "asc" ? "A-Z" : "Z-A"}
         </span>
       )}
@@ -305,30 +307,26 @@ export function StepHistory({ evaluations, onNew, onLoad, onDelete }: Props) {
 
   return (
     <div className="space-y-5">
-      <div
-        className="rounded-2xl p-5 flex items-start justify-between gap-4"
-        style={{ background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)" }}
-      >
-        <div>
-          <h1 style={{ color: "white", marginBottom: 4 }}>Evaluation History</h1>
-          <p style={{ color: "#94a3b8", fontSize: "0.87rem" }}>
-            Browse saved loan stress tests, compare results, and export reports.
-          </p>
-        </div>
-        <Button
-          onClick={onNew}
-          style={{ backgroundColor: "#3b82f6", color: "white", flexShrink: 0 }}
-          size="sm"
-        >
-          <Plus size={16} />
-          New
-        </Button>
-      </div>
+      <StepHeader
+        eyebrow="Step 3"
+        title="Evaluation history"
+        description="Browse saved loan stress tests, compare results, and export reports."
+        action={
+          <Button
+            onClick={onNew}
+            style={{ ...pillButton, flexShrink: 0, background: theme.canvas, color: theme.ink, borderColor: theme.canvas }}
+            size="sm"
+          >
+            <Plus size={16} />
+            New
+          </Button>
+        }
+      />
 
       {evaluations.length > 0 && (
         <div
-          className="bg-white rounded-2xl p-4 shadow-sm grid grid-cols-3 gap-3"
-          style={{ border: "1px solid #f1f5f9" }}
+          className="p-4 grid grid-cols-3 gap-3"
+          style={cardFlat}
         >
           {(["green", "yellow", "red"] as const).map((s) => {
             const cfg = STATUS_CONFIG[s];
@@ -352,45 +350,45 @@ export function StepHistory({ evaluations, onNew, onLoad, onDelete }: Props) {
 
       {evaluations.length === 0 ? (
         <div
-          className="bg-white rounded-2xl p-12 shadow-sm flex flex-col items-center gap-4"
-          style={{ border: "1px solid #f1f5f9" }}
+          className="p-12 flex flex-col items-center gap-4"
+          style={cardFlat}
         >
           <div
             className="w-16 h-16 rounded-2xl flex items-center justify-center"
-            style={{ backgroundColor: "#f8fafc" }}
+            style={{ backgroundColor: theme.canvas }}
           >
-            <Clock size={28} color="#9ca3af" />
+            <Clock size={28} color="theme.slate" />
           </div>
           <div className="text-center">
-            <p style={{ fontWeight: 600, color: "#374151", marginBottom: 4 }}>
+            <p style={{ fontWeight: 600, color: theme.ink, marginBottom: 4 }}>
               No saved evaluations yet
             </p>
-            <p style={{ color: "#9ca3af", fontSize: "0.85rem" }}>
+            <p style={{ color: theme.slate, fontSize: "0.85rem" }}>
               Complete a stress test and save your evaluation to see it here.
             </p>
           </div>
           <Button
             onClick={onNew}
-            style={{ backgroundColor: "#3b82f6", color: "white" }}
+            style={pillButton}
           >
             <Plus size={16} />
-            Start First Evaluation
+            Start first evaluation
           </Button>
         </div>
       ) : (
         <div
-          className="bg-white rounded-2xl shadow-sm overflow-hidden"
-          style={{ border: "1px solid #f1f5f9" }}
+          className="overflow-hidden"
+          style={cardFlat}
         >
           <div
             className="p-4 flex flex-col gap-3"
-            style={{ borderBottom: "1px solid #f1f5f9" }}
+            style={{ borderBottom: `1px solid ${theme.line}` }}
           >
             <div className="grid grid-cols-1 md:grid-cols-[1fr_150px_120px] gap-3">
               <div className="relative">
                 <Search
                   size={15}
-                  color="#9ca3af"
+                  color="theme.slate"
                   style={{ position: "absolute", left: 11, top: 10 }}
                 />
                 <Input
@@ -429,7 +427,7 @@ export function StepHistory({ evaluations, onNew, onLoad, onDelete }: Props) {
             </div>
 
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <p style={{ color: "#6b7280", fontSize: "0.78rem" }}>
+              <p style={{ color: theme.slate, fontSize: "0.78rem" }}>
                 Showing {hasRows ? startIndex + 1 : 0}-
                 {Math.min(startIndex + pageSize, filteredEvaluations.length)} of{" "}
                 {filteredEvaluations.length} saved evaluations
@@ -445,7 +443,7 @@ export function StepHistory({ evaluations, onNew, onLoad, onDelete }: Props) {
 
           <Table>
             <TableHeader>
-              <TableRow style={{ backgroundColor: "#f8fafc" }}>
+              <TableRow style={{ backgroundColor: theme.canvas }}>
                 <TableHead>
                   <SortButton sortKey="label" activeKey={sortKey} direction={sortDirection} onSort={handleSort}>
                     Evaluation
@@ -485,10 +483,10 @@ export function StepHistory({ evaluations, onNew, onLoad, onDelete }: Props) {
                 <TableRow>
                   <TableCell colSpan={8}>
                     <div className="py-10 text-center">
-                      <p style={{ color: "#374151", fontWeight: 700, marginBottom: 4 }}>
+                      <p style={{ color: theme.ink, fontWeight: 700, marginBottom: 4 }}>
                         No matching evaluations
                       </p>
-                      <p style={{ color: "#9ca3af", fontSize: "0.82rem" }}>
+                      <p style={{ color: theme.slate, fontSize: "0.82rem" }}>
                         Try clearing the search field or changing the status filter.
                       </p>
                     </div>
@@ -503,10 +501,10 @@ export function StepHistory({ evaluations, onNew, onLoad, onDelete }: Props) {
                     <TableRow key={ev.id}>
                       <TableCell>
                         <div style={{ minWidth: 160 }}>
-                          <div style={{ color: "#111827", fontWeight: 700, fontSize: "0.84rem" }}>
+                          <div style={{ color: theme.ink, fontWeight: 700, fontSize: "0.84rem" }}>
                             {ev.label}
                           </div>
-                          <div style={{ color: "#9ca3af", fontSize: "0.72rem" }}>
+                          <div style={{ color: theme.slate, fontSize: "0.72rem" }}>
                             Repay {fmtMoney(ev.inputs.repaymentAmount)}
                           </div>
                         </div>
@@ -536,10 +534,10 @@ export function StepHistory({ evaluations, onNew, onLoad, onDelete }: Props) {
                         </span>
                       </TableCell>
                       <TableCell>
-                        <div style={{ color: "#374151", fontWeight: 700 }}>
+                        <div style={{ color: theme.charcoal, fontWeight: 700 }}>
                           {fmtMoney(ev.inputs.loanAmount)}
                         </div>
-                        <div style={{ color: "#9ca3af", fontSize: "0.7rem" }}>
+                        <div style={{ color: theme.slate, fontSize: "0.7rem" }}>
                           Cost {fmtMoney(ev.result.trueCost)}
                         </div>
                       </TableCell>
@@ -547,31 +545,31 @@ export function StepHistory({ evaluations, onNew, onLoad, onDelete }: Props) {
                         <div style={{ color: cfg.textColor, fontWeight: 800 }}>
                           {Math.round(ev.result.healthScore)}/100
                         </div>
-                        <div style={{ color: "#9ca3af", fontSize: "0.7rem" }}>
+                        <div style={{ color: theme.slate, fontSize: "0.7rem" }}>
                           {fmtPercent(ev.result.effectiveRate)} rate
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div style={{ color: "#374151", fontWeight: 700 }}>
+                        <div style={{ color: theme.charcoal, fontWeight: 700 }}>
                           {format(dueDate, "MMM d")}
                         </div>
-                        <div style={{ color: "#9ca3af", fontSize: "0.7rem" }}>
+                        <div style={{ color: theme.slate, fontSize: "0.7rem" }}>
                           {ev.result.daysUntilDue} days
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div style={{ color: "#374151", fontWeight: 700 }}>
+                        <div style={{ color: theme.charcoal, fontWeight: 700 }}>
                           {fmtPercent(ev.peakStressLevel)}
                         </div>
-                        <div style={{ color: "#9ca3af", fontSize: "0.7rem" }}>
+                        <div style={{ color: theme.slate, fontSize: "0.7rem" }}>
                           peak tested
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div style={{ color: "#374151", fontWeight: 700 }}>
+                        <div style={{ color: theme.charcoal, fontWeight: 700 }}>
                           {format(new Date(ev.savedAt), "MMM d")}
                         </div>
-                        <div style={{ color: "#9ca3af", fontSize: "0.7rem" }}>
+                        <div style={{ color: theme.slate, fontSize: "0.7rem" }}>
                           {format(new Date(ev.savedAt), "h:mm a")}
                         </div>
                       </TableCell>
@@ -595,7 +593,7 @@ export function StepHistory({ evaluations, onNew, onLoad, onDelete }: Props) {
                               cursor: "pointer",
                               padding: "7px",
                               borderRadius: 6,
-                              color: "#9ca3af",
+                              color: theme.slate,
                               display: "flex",
                               alignItems: "center",
                             }}
@@ -614,9 +612,9 @@ export function StepHistory({ evaluations, onNew, onLoad, onDelete }: Props) {
 
           <div
             className="p-4 flex flex-col sm:flex-row items-center justify-between gap-3"
-            style={{ borderTop: "1px solid #f1f5f9" }}
+            style={{ borderTop: `1px solid ${theme.line}` }}
           >
-            <p style={{ color: "#6b7280", fontSize: "0.78rem" }}>
+            <p style={{ color: theme.slate, fontSize: "0.78rem" }}>
               Page {hasRows ? pageIndex + 1 : 0} of {hasRows ? totalPages : 0}
             </p>
             <div className="flex items-center gap-2">

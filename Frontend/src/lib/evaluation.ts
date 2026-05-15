@@ -24,10 +24,29 @@ export type EvaluationResult = {
   recommendedTerm: number;
 };
 
-function statusToHealthScore(status: RiskStatus): number {
-  if (status === 'green') return 85;
-  if (status === 'yellow') return 50;
-  return 18;
+function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
+}
+
+function cashPositionToHealthScore(
+  projectedCash: number,
+  minimumBuffer: number,
+  totalRepayment: number,
+): number {
+  const repaymentScale = Math.max(1, totalRepayment);
+
+  if (projectedCash < 0) {
+    return Math.round(32 * clamp((projectedCash + repaymentScale) / repaymentScale, 0, 1));
+  }
+
+  if (projectedCash < minimumBuffer) {
+    const bufferScale = Math.max(1, minimumBuffer);
+    return Math.round(33 + 32 * clamp(projectedCash / bufferScale, 0, 1));
+  }
+
+  const surplusScale = Math.max(1, minimumBuffer, totalRepayment);
+  const surplus = projectedCash - minimumBuffer;
+  return Math.round(66 + 34 * clamp(surplus / surplusScale, 0, 1));
 }
 
 const badDayMode = stressModes.find((mode) => mode.kind === 'bad-day')!;
@@ -72,7 +91,11 @@ export function evaluateLoan(
   );
 
   return {
-    healthScore: statusToHealthScore(sim.status),
+    healthScore: cashPositionToHealthScore(
+      sim.projectedCash,
+      ui.minCashBuffer,
+      ui.repaymentAmount,
+    ),
     healthStatus: sim.status,
     projectedCash: sim.projectedCash,
     cashAfterNormal: baseline.projectedCash,
