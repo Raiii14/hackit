@@ -8,13 +8,13 @@ import {
   BookmarkCheck,
   Lock,
   Users,
-  ChevronDown,
-  Sparkles,
   Target,
   AlertTriangle,
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { CashHealthGauge } from "./CashHealthGauge";
+import { AppNavbar } from "./AppNavbar";
+import { theme } from "../../lib/theme";
 
 interface LandingPageProps {
   onStartTest: () => void;
@@ -23,69 +23,88 @@ interface LandingPageProps {
 }
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 24 },
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.12, duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+    transition: { delay: i * 0.1, duration: 0.55, ease: [0.22, 1, 0.36, 1] },
   }),
 };
 
 const scaleIn = {
-  hidden: { opacity: 0, scale: 0.85 },
+  hidden: { opacity: 0, scale: 0.96 },
   visible: {
     opacity: 1,
     scale: 1,
-    transition: { delay: 0.4, duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+    transition: { delay: 0.32, duration: 0.55, ease: [0.22, 1, 0.36, 1] },
   },
 };
 
 const FEATURES = [
   {
-    icon: <BarChart3 size={22} />,
+    icon: <BarChart3 size={21} />,
     title: "True Cost Reveal",
-    desc: "See your loan's real price: cost per ₱100, daily interest, and total fees — before you sign.",
-    color: "#3b82f6",
-    bg: "#eff6ff",
+    desc: "See the fees, repayment total, and estimated daily cost before the offer becomes a commitment.",
+    color: theme.ink,
+    bg: "#EFEAE5",
   },
   {
-    icon: <TrendingDown size={22} />,
+    icon: <TrendingDown size={21} />,
     title: "Stress-Test Resilience",
-    desc: "Simulate 10% to 100% income drops and see exactly when your cash flow breaks.",
-    color: "#f59e0b",
-    bg: "#fffbeb",
+    desc: "Try generic income drops like 10%, 30%, or 60% and see when cash falls below your buffer.",
+    color: theme.rust,
+    bg: "#FDE8DC",
   },
   {
-    icon: <BookmarkCheck size={22} />,
-    title: "Save & Compare",
-    desc: "Save every check, compare offers side by side, and track your borrowing profile over time.",
-    color: "#16a34a",
-    bg: "#f0fdf4",
+    icon: <BookmarkCheck size={21} />,
+    title: "Save & Review",
+    desc: "Keep checks in local history so the pitch demo can show past offers without requiring login.",
+    color: theme.green,
+    bg: "#E7F3EA",
   },
 ];
 
 const STEPS_PREVIEW = [
   {
     num: 1,
-    label: "Enter your loan offer & cash flow",
+    label: "Baseline",
+    detail: "Enter the six loan and cash-flow inputs.",
     icon: <Target size={16} />,
   },
   {
     num: 2,
-    label: "Get your risk score & true cost",
-    icon: <BarChart3 size={16} />,
-  },
-  {
-    num: 3,
-    label: "Stress-test with income drops",
+    label: "Verdict",
+    detail: "See status, true cost, projected cash, and stress controls in one place.",
     icon: <AlertTriangle size={16} />,
   },
   {
-    num: 4,
-    label: "Save, review, and decide",
+    num: 3,
+    label: "History",
+    detail: "Save, reload, and compare checks from local history.",
     icon: <BookmarkCheck size={16} />,
   },
 ];
+
+function MiniMetric({
+  label,
+  value,
+  tone = theme.ink,
+}: {
+  label: string;
+  value: string;
+  tone?: string;
+}) {
+  return (
+    <div>
+      <div style={{ color: theme.slate, fontSize: "0.76rem", marginBottom: 4 }}>
+        {label}
+      </div>
+      <div style={{ color: tone, fontSize: "1.02rem", fontWeight: 700 }}>
+        {value}
+      </div>
+    </div>
+  );
+}
 
 export function LandingPage({
   onStartTest,
@@ -93,539 +112,356 @@ export function LandingPage({
   savedCount,
 }: LandingPageProps) {
   return (
-    <div
-      className="min-h-screen"
-      style={{
-        background:
-          "linear-gradient(180deg, #0f172a 0%, #1e293b 40%, #f0f4f8 40%)",
-      }}
-    >
-      {/* ─── Navigation ─────────────────────────────── */}
-      <header className="relative z-10">
-        <div className="max-w-5xl mx-auto px-5 py-5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg"
-              style={{
-                background:
-                  "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
-              }}
-            >
-              <Shield size={20} color="white" />
-            </div>
-            <div>
-              <div
-                style={{
-                  color: "white",
-                  fontWeight: 800,
-                  fontSize: "1.2rem",
-                  lineHeight: 1.2,
-                  letterSpacing: "-0.02em",
-                }}
-              >
-                LoanWise
-              </div>
-              <div
-                style={{
-                  color: "#93c5fd",
-                  fontSize: "0.65rem",
-                  lineHeight: 1,
-                  letterSpacing: "0.08em",
-                  textTransform: "uppercase",
-                }}
-              >
-                Repayment Stress Simulator
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            {savedCount > 0 && (
-              <button
-                onClick={onUseAccount}
-                className="hidden sm:flex items-center gap-1.5"
-                style={{
-                  background: "none",
-                  border: "1px solid rgba(255,255,255,0.15)",
-                  borderRadius: 8,
-                  cursor: "pointer",
-                  color: "#93c5fd",
-                  fontSize: "0.82rem",
-                  padding: "6px 14px",
-                }}
-              >
-                <BookmarkCheck size={14} />
-                History ({savedCount})
-              </button>
-            )}
-            <button
-              onClick={onUseAccount}
-              className="flex items-center gap-1.5"
-              style={{
-                background: "rgba(255,255,255,0.08)",
-                border: "1px solid rgba(255,255,255,0.15)",
-                borderRadius: 8,
-                cursor: "pointer",
-                color: "white",
-                fontSize: "0.82rem",
-                fontWeight: 500,
-                padding: "6px 14px",
-                backdropFilter: "blur(8px)",
-              }}
-            >
-              <Lock size={13} />
-              Use account
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* ─── Hero ─────────────────────────────────── */}
-      <section className="relative overflow-hidden" style={{ paddingBottom: 0 }}>
-        {/* Gradient orb effects */}
+    <div className="min-h-screen" style={{ background: theme.canvas }}>
+      <section
+        style={{
+          background: theme.ink,
+          color: theme.canvas,
+          minHeight: "720px",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
         <div
+          aria-hidden="true"
           style={{
             position: "absolute",
-            top: -120,
-            left: "10%",
-            width: 420,
-            height: 420,
+            width: 980,
+            height: 460,
+            left: "50%",
+            top: 150,
+            border: `1px solid rgba(243, 115, 56, 0.24)`,
             borderRadius: "50%",
-            background:
-              "radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%)",
+            transform: "translateX(-50%) rotate(-8deg)",
             pointerEvents: "none",
           }}
         />
         <div
+          aria-hidden="true"
           style={{
             position: "absolute",
-            top: -60,
-            right: "5%",
-            width: 320,
-            height: 320,
+            width: 560,
+            height: 260,
+            right: -80,
+            top: 260,
+            border: `1px solid rgba(243, 115, 56, 0.16)`,
             borderRadius: "50%",
-            background:
-              "radial-gradient(circle, rgba(34,197,94,0.1) 0%, transparent 70%)",
+            transform: "rotate(18deg)",
             pointerEvents: "none",
           }}
         />
+        <div className="relative z-10 max-w-6xl mx-auto px-5">
+          <AppNavbar
+            onLogoClick={onStartTest}
+            savedCount={savedCount}
+            onHistoryClick={onUseAccount}
+            onAccountClick={onUseAccount}
+          />
 
-        <div className="max-w-5xl mx-auto px-5 pt-8 pb-0">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-            {/* Left copy */}
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              className="relative z-10"
-            >
+          <div
+            className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-10 items-center"
+            style={{ padding: "72px 0 56px" }}
+          >
+            <motion.div initial="hidden" animate="visible" style={{ maxWidth: 670 }}>
               <motion.div
                 variants={fadeUp}
                 custom={0}
-                className="inline-flex items-center gap-2 mb-4"
+                className="flex items-center gap-2"
                 style={{
-                  background: "rgba(59,130,246,0.15)",
-                  border: "1px solid rgba(59,130,246,0.25)",
-                  borderRadius: 999,
-                  padding: "5px 14px",
+                  color: "#FFD8C6",
+                  fontSize: "0.76rem",
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.08em",
+                  marginBottom: 22,
                 }}
               >
-                <Sparkles
-                  size={13}
-                  style={{ color: "#60a5fa" }}
-                />
                 <span
                   style={{
-                    color: "#93c5fd",
-                    fontSize: "0.75rem",
-                    fontWeight: 600,
-                    letterSpacing: "0.04em",
+                    width: 7,
+                    height: 7,
+                    borderRadius: "50%",
+                    background: theme.orange,
+                    display: "inline-block",
                   }}
-                >
-                  Free stress test — no sign-up needed
-                </span>
+                />
+                For sari-sari and small online sellers
               </motion.div>
 
               <motion.h1
                 variants={fadeUp}
                 custom={1}
+                className="text-5xl md:text-7xl"
                 style={{
-                  color: "white",
-                  fontSize: "clamp(2rem, 5vw, 3rem)",
-                  fontWeight: 800,
-                  lineHeight: 1.1,
-                  letterSpacing: "-0.03em",
-                  marginBottom: 16,
+                  color: theme.canvas,
+                  fontWeight: 600,
+                  lineHeight: 1,
+                  letterSpacing: 0,
+                  marginBottom: 24,
                 }}
               >
-                Is your next loan{" "}
-                <span
-                  style={{
-                    background:
-                      "linear-gradient(135deg, #60a5fa, #34d399)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                  }}
-                >
-                  safe for your store?
-                </span>
+                LoanWise
               </motion.h1>
 
               <motion.p
                 variants={fadeUp}
                 custom={2}
                 style={{
-                  color: "#94a3b8",
-                  fontSize: "1.05rem",
-                  lineHeight: 1.6,
-                  maxWidth: 480,
-                  marginBottom: 28,
+                  color: "rgba(243,240,238,0.76)",
+                  fontSize: "1.12rem",
+                  lineHeight: 1.65,
+                  maxWidth: 570,
+                  marginBottom: 32,
                 }}
               >
-                LoanWise turns any loan offer into a cash-flow stress test.
-                See the real cost, test your worst-case scenario, and decide
-                with confidence — all in under 2 minutes.
+                A repayment stress simulator that shows whether a loan still fits
+                after a bad sales day, a tighter cash buffer, or a 30% income drop.
               </motion.p>
 
               <motion.div
                 variants={fadeUp}
                 custom={3}
                 className="flex flex-wrap items-center gap-3"
+                style={{ marginBottom: 34 }}
               >
                 <Button
                   onClick={onStartTest}
                   size="lg"
                   style={{
-                    background:
-                      "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
-                    color: "white",
-                    padding: "14px 32px",
-                    fontSize: "1rem",
-                    fontWeight: 700,
-                    borderRadius: 12,
-                    boxShadow:
-                      "0 4px 14px rgba(59,130,246,0.4), 0 0 0 1px rgba(59,130,246,0.1)",
-                    border: "none",
+                    background: theme.canvas,
+                    color: theme.ink,
+                    border: `1px solid ${theme.canvas}`,
+                    borderRadius: 999,
+                    minHeight: 52,
+                    padding: "0 26px",
+                    fontSize: "0.98rem",
+                    fontWeight: 600,
                   }}
                 >
                   Start free test
                   <ArrowRight size={18} />
                 </Button>
-
                 <button
                   onClick={onUseAccount}
                   style={{
-                    background: "none",
-                    border: "1px solid rgba(255,255,255,0.2)",
-                    borderRadius: 12,
-                    padding: "13px 24px",
-                    color: "#cbd5e1",
-                    fontSize: "0.92rem",
-                    fontWeight: 500,
+                    background: "transparent",
+                    border: "1px solid rgba(243,240,238,0.28)",
+                    borderRadius: 999,
+                    color: theme.canvas,
                     cursor: "pointer",
-                    transition: "all 0.2s",
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.borderColor =
-                      "rgba(255,255,255,0.4)";
-                    e.currentTarget.style.color = "white";
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.borderColor =
-                      "rgba(255,255,255,0.2)";
-                    e.currentTarget.style.color = "#cbd5e1";
+                    minHeight: 52,
+                    padding: "0 24px",
+                    fontSize: "0.98rem",
+                    fontWeight: 500,
                   }}
                 >
-                  Use account
+                  View history
                 </button>
               </motion.div>
 
-              {/* Trust badges */}
               <motion.div
                 variants={fadeUp}
                 custom={4}
-                className="flex flex-wrap items-center gap-4 mt-8"
+                className="flex flex-wrap gap-x-6 gap-y-3"
+                style={{
+                  color: "rgba(243,240,238,0.72)",
+                  fontSize: "0.84rem",
+                }}
               >
                 {[
-                  { icon: <Users size={13} />, text: "Guest mode first" },
-                  { icon: <Lock size={13} />, text: "No data collected" },
-                  { icon: <Zap size={13} />, text: "Instant results" },
+                  { icon: <Users size={14} />, text: "Guest mode first" },
+                  { icon: <Lock size={14} />, text: "Private by default" },
+                  { icon: <Zap size={14} />, text: "Fast verdict" },
                 ].map((badge) => (
-                  <div
-                    key={badge.text}
-                    className="flex items-center gap-1.5"
-                    style={{ color: "#64748b", fontSize: "0.78rem" }}
-                  >
+                  <span key={badge.text} className="flex items-center gap-1.5">
                     {badge.icon}
                     {badge.text}
-                  </div>
+                  </span>
                 ))}
               </motion.div>
             </motion.div>
 
-            {/* Right — floating gauge preview */}
             <motion.div
               variants={scaleIn}
               initial="hidden"
               animate="visible"
-              className="hidden lg:flex justify-center"
+              className="hidden lg:block"
+              aria-label="LoanWise sample verdict preview"
             >
               <div
                 style={{
-                  position: "relative",
-                  background:
-                    "linear-gradient(145deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%)",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                  borderRadius: 28,
-                  padding: "32px 24px 20px",
-                  backdropFilter: "blur(12px)",
-                  boxShadow: "0 32px 64px rgba(0,0,0,0.3)",
+                  background: theme.paper,
+                  borderRadius: 40,
+                  padding: 28,
+                  color: theme.ink,
+                  boxShadow: "0 28px 70px rgba(0,0,0,0.28)",
                 }}
               >
-                <div
-                  style={{
-                    background: "white",
-                    borderRadius: 20,
-                    padding: "20px 16px 12px",
-                    boxShadow: "0 8px 32px rgba(0,0,0,0.08)",
-                  }}
-                >
-                  <CashHealthGauge score={72} size={240} />
+                <div className="flex items-start justify-between gap-4" style={{ marginBottom: 22 }}>
+                  <div>
+                    <div style={{ color: theme.slate, fontSize: "0.78rem", marginBottom: 4 }}>
+                      Sample verdict
+                    </div>
+                    <div style={{ color: theme.ink, fontSize: "1.35rem", fontWeight: 700 }}>
+                      Manageable now
+                    </div>
+                  </div>
+                  <span
+                    style={{
+                      background: "#FFF3E9",
+                      border: "1px solid #F6C5A6",
+                      borderRadius: 999,
+                      color: theme.rust,
+                      fontSize: "0.76rem",
+                      fontWeight: 700,
+                      padding: "6px 10px",
+                    }}
+                  >
+                    30% drop turns risky
+                  </span>
                 </div>
+
+                <div className="flex justify-center" style={{ marginBottom: 24 }}>
+                  <CashHealthGauge score={72} size={230} />
+                </div>
+
                 <div
-                  className="text-center mt-3"
+                  className="grid grid-cols-3 gap-4"
                   style={{
-                    color: "#94a3b8",
-                    fontSize: "0.72rem",
-                    letterSpacing: "0.04em",
+                    borderTop: `1px solid ${theme.line}`,
+                    paddingTop: 20,
                   }}
                 >
-                  LIVE PREVIEW • SAMPLE DATA
+                  <MiniMetric label="Borrow" value="₱5,000" />
+                  <MiniMetric label="Repay" value="₱5,850" tone={theme.rust} />
+                  <MiniMetric label="Cash left" value="₱1,250" tone={theme.green} />
                 </div>
               </div>
             </motion.div>
           </div>
-
-          {/* Scroll hint */}
-          <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{
-              repeat: Infinity,
-              duration: 2,
-              ease: "easeInOut",
-            }}
-            className="flex justify-center pt-6 pb-4"
-          >
-            <ChevronDown
-              size={24}
-              style={{ color: "#475569", opacity: 0.5 }}
-            />
-          </motion.div>
         </div>
       </section>
 
-      {/* ─── How it Works ──────────────────────────── */}
       <section
         style={{
-          background: "#f0f4f8",
-          paddingTop: 48,
-          paddingBottom: 56,
+          background: theme.canvas,
+          paddingTop: 54,
+          paddingBottom: 62,
         }}
       >
-        <div className="max-w-5xl mx-auto px-5">
+        <div className="max-w-6xl mx-auto px-5">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 18 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="text-center mb-10"
+            transition={{ duration: 0.45 }}
+            className="mb-10"
+            style={{ maxWidth: 620 }}
           >
             <div
-              className="inline-flex items-center gap-2 mb-3"
+              className="flex items-center gap-2"
               style={{
-                background: "#e0e7ff",
-                borderRadius: 999,
-                padding: "5px 14px",
+                color: theme.rust,
+                fontSize: "0.76rem",
+                fontWeight: 700,
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+                marginBottom: 12,
               }}
             >
-              <Zap size={13} style={{ color: "#4f46e5" }} />
-              <span
-                style={{
-                  color: "#4338ca",
-                  fontSize: "0.75rem",
-                  fontWeight: 700,
-                  letterSpacing: "0.04em",
-                  textTransform: "uppercase",
-                }}
-              >
-                4-Step Process
-              </span>
+              <Zap size={14} />
+              Demo loop
             </div>
             <h2
+              className="text-3xl md:text-4xl"
               style={{
-                color: "#0f172a",
-                fontSize: "clamp(1.5rem, 3vw, 2.2rem)",
-                fontWeight: 800,
-                lineHeight: 1.2,
-                letterSpacing: "-0.02em",
+                color: theme.ink,
+                fontWeight: 600,
+                lineHeight: 1.15,
+                letterSpacing: 0,
+                marginBottom: 10,
               }}
             >
-              Know your risk in under 2 minutes
+              Baseline, verdict, history.
             </h2>
-            <p
-              style={{
-                color: "#64748b",
-                fontSize: "1rem",
-                marginTop: 8,
-                maxWidth: 520,
-                marginLeft: "auto",
-                marginRight: "auto",
-              }}
-            >
-              LoanWise walks you through a simple 4-step process to evaluate
-              any loan offer against your real cash flow.
+            <p style={{ color: theme.slate, fontSize: "1rem", lineHeight: 1.6 }}>
+              The landing page now points to the same lean flow the team is shipping:
+              enter the loan, see one verdict surface, then save the check.
             </p>
           </motion.div>
 
-          {/* Steps timeline */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {STEPS_PREVIEW.map((step, i) => (
               <motion.div
                 key={step.num}
-                initial={{ opacity: 0, y: 24 }}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.1, duration: 0.5 }}
+                transition={{ delay: i * 0.08, duration: 0.45 }}
                 style={{
-                  background: "white",
-                  borderRadius: 16,
-                  padding: "20px 18px",
-                  border: "1px solid #e2e8f0",
-                  position: "relative",
-                  overflow: "hidden",
+                  background: theme.paper,
+                  border: `1px solid ${theme.line}`,
+                  borderRadius: 24,
+                  padding: 24,
                 }}
               >
-                {/* Step number watermark */}
-                <div
-                  style={{
-                    position: "absolute",
-                    top: -8,
-                    right: 8,
-                    fontSize: "4rem",
-                    fontWeight: 900,
-                    color: "rgba(59,130,246,0.05)",
-                    lineHeight: 1,
-                  }}
-                >
-                  {step.num}
-                </div>
-                <div
-                  className="flex items-center gap-2 mb-2"
-                  style={{ position: "relative", zIndex: 1 }}
-                >
-                  <div
+                <div className="flex items-center justify-between" style={{ marginBottom: 22 }}>
+                  <span
+                    className="w-9 h-9 rounded-full flex items-center justify-center"
                     style={{
-                      width: 28,
-                      height: 28,
-                      borderRadius: "50%",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      background:
-                        "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
-                      color: "white",
-                      fontSize: "0.75rem",
-                      fontWeight: 800,
-                      flexShrink: 0,
+                      background: theme.ink,
+                      color: theme.canvas,
+                      fontSize: "0.86rem",
+                      fontWeight: 700,
                     }}
                   >
                     {step.num}
-                  </div>
-                  <div
-                    style={{
-                      color: "#64748b",
-                      display: "flex",
-                      alignItems: "center",
-                    }}
-                  >
-                    {step.icon}
-                  </div>
+                  </span>
+                  <span style={{ color: theme.rust }}>{step.icon}</span>
                 </div>
-                <p
-                  style={{
-                    color: "#334155",
-                    fontSize: "0.88rem",
-                    fontWeight: 500,
-                    lineHeight: 1.4,
-                    margin: 0,
-                    position: "relative",
-                    zIndex: 1,
-                  }}
-                >
+                <h3 style={{ color: theme.ink, fontSize: "1.22rem", fontWeight: 700, marginBottom: 8 }}>
                   {step.label}
+                </h3>
+                <p style={{ color: theme.slate, fontSize: "0.92rem", lineHeight: 1.55, margin: 0 }}>
+                  {step.detail}
                 </p>
               </motion.div>
             ))}
           </div>
+        </div>
+      </section>
 
-          {/* Feature cards */}
+      <section style={{ background: theme.canvas, paddingBottom: 58 }}>
+        <div className="max-w-6xl mx-auto px-5">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {FEATURES.map((feature, i) => (
               <motion.div
                 key={feature.title}
-                initial={{ opacity: 0, y: 24 }}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.12, duration: 0.5 }}
-                className="group"
+                transition={{ delay: i * 0.08, duration: 0.45 }}
                 style={{
-                  background: "white",
-                  borderRadius: 20,
+                  background: theme.paper,
+                  borderRadius: 24,
                   padding: "28px 24px",
-                  border: "1px solid #e2e8f0",
-                  cursor: "default",
-                  transition: "all 0.3s ease",
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.transform = "translateY(-4px)";
-                  e.currentTarget.style.boxShadow =
-                    "0 12px 32px rgba(0,0,0,0.08)";
-                  e.currentTarget.style.borderColor = feature.color + "40";
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow =
-                    "0 1px 3px rgba(0,0,0,0.04)";
-                  e.currentTarget.style.borderColor = "#e2e8f0";
+                  border: `1px solid ${theme.line}`,
                 }}
               >
                 <div
-                  className="w-11 h-11 rounded-xl flex items-center justify-center mb-4"
+                  className="w-11 h-11 rounded-full flex items-center justify-center"
                   style={{
-                    backgroundColor: feature.bg,
+                    background: feature.bg,
                     color: feature.color,
+                    marginBottom: 18,
                   }}
                 >
                   {feature.icon}
                 </div>
-                <h3
-                  style={{
-                    color: "#0f172a",
-                    fontSize: "1.1rem",
-                    fontWeight: 700,
-                    marginBottom: 8,
-                  }}
-                >
+                <h3 style={{ color: theme.ink, fontSize: "1.12rem", fontWeight: 700, marginBottom: 8 }}>
                   {feature.title}
                 </h3>
-                <p
-                  style={{
-                    color: "#64748b",
-                    fontSize: "0.88rem",
-                    lineHeight: 1.55,
-                    margin: 0,
-                  }}
-                >
+                <p style={{ color: theme.slate, fontSize: "0.92rem", lineHeight: 1.58, margin: 0 }}>
                   {feature.desc}
                 </p>
               </motion.div>
@@ -634,193 +470,70 @@ export function LandingPage({
         </div>
       </section>
 
-      {/* ─── Social Proof / Purpose ─────────────────── */}
-      <section style={{ background: "#f0f4f8", paddingBottom: 48 }}>
-        <div className="max-w-5xl mx-auto px-5">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+      <section style={{ background: theme.canvas, paddingBottom: 70 }}>
+        <div className="max-w-6xl mx-auto px-5">
+          <div
+            className="grid grid-cols-1 md:grid-cols-[1.1fr_0.9fr] gap-8 items-center"
             style={{
-              background:
-                "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
-              borderRadius: 24,
-              padding: "36px 32px",
-              position: "relative",
-              overflow: "hidden",
+              borderTop: `1px solid ${theme.line}`,
+              paddingTop: 34,
             }}
           >
-            {/* Decorative gradient orb */}
-            <div
-              style={{
-                position: "absolute",
-                top: -60,
-                right: -40,
-                width: 200,
-                height: 200,
-                borderRadius: "50%",
-                background:
-                  "radial-gradient(circle, rgba(59,130,246,0.2) 0%, transparent 70%)",
-                pointerEvents: "none",
-              }}
-            />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center relative z-10">
-              <div>
-                <h3
-                  style={{
-                    color: "white",
-                    fontSize: "1.4rem",
-                    fontWeight: 700,
-                    marginBottom: 8,
-                    lineHeight: 1.3,
-                  }}
-                >
-                  Built for sari-sari and small online sellers
-                </h3>
-                <p
-                  style={{
-                    color: "#94a3b8",
-                    fontSize: "0.92rem",
-                    lineHeight: 1.6,
-                    margin: 0,
-                  }}
-                >
-                  LoanWise is a FinTech-for-Change prototype aligned with
-                  SDG 1, SDG 8, and SDG 10. It helps micro-entrepreneurs
-                  make informed borrowing decisions — no data collected, no
-                  lending advice, just math.
-                </p>
-              </div>
-
-              <div className="flex flex-wrap gap-3 justify-start md:justify-end">
-                {["SDG 1 · No Poverty", "SDG 8 · Decent Work", "SDG 10 · Reduced Inequality"].map(
-                  (sdg) => (
-                    <div
-                      key={sdg}
-                      style={{
-                        background: "rgba(255,255,255,0.06)",
-                        border: "1px solid rgba(255,255,255,0.1)",
-                        borderRadius: 10,
-                        padding: "8px 14px",
-                        color: "#94a3b8",
-                        fontSize: "0.78rem",
-                        fontWeight: 500,
-                      }}
-                    >
-                      {sdg}
-                    </div>
-                  )
-                )}
-                <div
-                  style={{
-                    background: "rgba(239,68,68,0.1)",
-                    border: "1px solid rgba(239,68,68,0.2)",
-                    borderRadius: 10,
-                    padding: "8px 14px",
-                    color: "#fca5a5",
-                    fontSize: "0.78rem",
-                    fontWeight: 500,
-                  }}
-                >
-                  Prototype only — not lending advice
-                </div>
-              </div>
+            <div>
+              <h2
+                className="text-2xl md:text-3xl"
+                style={{
+                  color: theme.ink,
+                  fontWeight: 600,
+                  lineHeight: 1.2,
+                  letterSpacing: 0,
+                  marginBottom: 10,
+                }}
+              >
+                Built for practical borrowing decisions.
+              </h2>
+              <p style={{ color: theme.slate, fontSize: "1rem", lineHeight: 1.65, margin: 0 }}>
+                LoanWise is a prototype for sari-sari and small informal sellers.
+                It shows math and risk signals only. It does not recommend taking a loan.
+              </p>
             </div>
-          </motion.div>
+            <div className="flex flex-wrap gap-3 md:justify-end">
+              {["SDG 1", "SDG 8", "SDG 10", "Prototype, not lending advice"].map((label) => (
+                <span
+                  key={label}
+                  style={{
+                    border: `1px solid ${theme.line}`,
+                    borderRadius: 999,
+                    color: label.startsWith("Prototype") ? theme.rust : theme.charcoal,
+                    fontSize: "0.82rem",
+                    fontWeight: 600,
+                    padding: "9px 13px",
+                  }}
+                >
+                  {label}
+                </span>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* ─── Bottom CTA ─────────────────────────────── */}
-      <section
-        style={{
-          background: "#f0f4f8",
-          paddingTop: 16,
-          paddingBottom: 80,
-        }}
-      >
-        <div className="max-w-5xl mx-auto px-5 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            <h2
-              style={{
-                color: "#0f172a",
-                fontSize: "clamp(1.4rem, 3vw, 2rem)",
-                fontWeight: 800,
-                marginBottom: 12,
-                lineHeight: 1.2,
-              }}
-            >
-              Ready to check your loan offer?
-            </h2>
-            <p
-              style={{
-                color: "#64748b",
-                fontSize: "1rem",
-                marginBottom: 24,
-                maxWidth: 440,
-                marginLeft: "auto",
-                marginRight: "auto",
-              }}
-            >
-              No sign-up, no data stored, no catches. Just honest math
-              about your next loan.
-            </p>
-            <Button
-              onClick={onStartTest}
-              size="lg"
-              style={{
-                background:
-                  "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
-                color: "white",
-                padding: "14px 36px",
-                fontSize: "1rem",
-                fontWeight: 700,
-                borderRadius: 12,
-                boxShadow:
-                  "0 4px 14px rgba(59,130,246,0.4), 0 0 0 1px rgba(59,130,246,0.1)",
-                border: "none",
-              }}
-            >
-              Start free test
-              <ArrowRight size={18} />
-            </Button>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ─── Footer ──────────────────────────────────── */}
       <footer
         style={{
-          background: "#0f172a",
-          borderTop: "1px solid #1e293b",
+          background: theme.ink,
+          borderTop: "1px solid rgba(255,255,255,0.08)",
           padding: "24px 0",
         }}
       >
-        <div className="max-w-5xl mx-auto px-5 flex flex-wrap items-center justify-between gap-4">
+        <div className="max-w-6xl mx-auto px-5 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <Shield size={16} style={{ color: "#3b82f6" }} />
-            <span
-              style={{
-                color: "#64748b",
-                fontSize: "0.82rem",
-              }}
-            >
-              LoanWise — FinTech for Change
+            <Shield size={16} style={{ color: theme.orange }} />
+            <span style={{ color: "rgba(243,240,238,0.64)", fontSize: "0.84rem" }}>
+              LoanWise
             </span>
           </div>
-          <span
-            style={{
-              color: "#475569",
-              fontSize: "0.75rem",
-            }}
-          >
-            Prototype only • Not financial advice
+          <span style={{ color: "rgba(243,240,238,0.48)", fontSize: "0.76rem" }}>
+            Prototype only. Not financial advice.
           </span>
         </div>
       </footer>

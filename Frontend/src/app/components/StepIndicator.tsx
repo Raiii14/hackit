@@ -1,4 +1,5 @@
 import { Check } from "lucide-react";
+import { theme } from "../../lib/theme";
 
 interface StepIndicatorProps {
   currentStep: number;
@@ -8,15 +9,14 @@ interface StepIndicatorProps {
 
 const STEPS = [
   { num: 1, label: "Baseline Inputs" },
-  { num: 2, label: "Offer Evaluation" },
-  { num: 3, label: "Stress Test" },
-  { num: 4, label: "History" },
+  { num: 2, label: "Verdict" },
+  { num: 3, label: "History" },
 ];
 
 export function StepIndicator({ currentStep, canNavigate, onStepClick }: StepIndicatorProps) {
   return (
-    <div style={{ backgroundColor: "#1e293b", borderBottom: "1px solid #334155" }}>
-      <div className="max-w-4xl mx-auto px-4 py-3">
+    <div style={{ backgroundColor: theme.paper, borderBottom: `1px solid ${theme.line}` }}>
+      <div className="max-w-4xl mx-auto px-4 py-4">
         <div className="flex items-center">
           {STEPS.map((step, i) => {
             const isActive = currentStep === step.num;
@@ -29,25 +29,28 @@ export function StepIndicator({ currentStep, canNavigate, onStepClick }: StepInd
                   disabled={!clickable}
                   onClick={() => clickable && onStepClick(step.num)}
                   className="flex items-center gap-2 min-w-0"
-                  style={{ background: "none", border: "none", cursor: clickable ? "pointer" : "default", padding: 0 }}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: clickable ? "pointer" : "default",
+                    padding: 0,
+                  }}
                 >
-                  {/* Step circle */}
                   <div
                     style={{
-                      width: 30,
-                      height: 30,
+                      width: 32,
+                      height: 32,
                       borderRadius: "50%",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                       flexShrink: 0,
                       backgroundColor: isActive
-                        ? "#3b82f6"
+                        ? theme.ink
                         : isCompleted
-                        ? "#22c55e"
-                        : "#334155",
-                      color: isActive || isCompleted ? "white" : "#64748b",
-                      transition: "background-color 0.2s",
+                          ? theme.green
+                          : theme.line,
+                      color: isActive || isCompleted ? theme.canvas : theme.slate,
                       fontSize: "0.8rem",
                       fontWeight: 700,
                     }}
@@ -55,27 +58,23 @@ export function StepIndicator({ currentStep, canNavigate, onStepClick }: StepInd
                     {isCompleted ? <Check size={14} /> : step.num}
                   </div>
 
-                  {/* Label (hidden on small screens) */}
                   <span
                     className="hidden sm:inline truncate"
                     style={{
-                      color: isActive ? "white" : isCompleted ? "#86efac" : "#64748b",
+                      color: isActive ? theme.ink : isCompleted ? theme.green : theme.slate,
                       fontSize: "0.78rem",
-                      fontWeight: isActive ? 600 : 400,
-                      transition: "color 0.2s",
+                      fontWeight: isActive ? 600 : 450,
                     }}
                   >
                     {step.label}
                   </span>
                 </button>
 
-                {/* Connector */}
                 {i < STEPS.length - 1 && (
                   <div
                     className="flex-1 h-px mx-2 min-w-[8px]"
                     style={{
-                      backgroundColor: currentStep > step.num ? "#22c55e" : "#334155",
-                      transition: "background-color 0.3s",
+                      backgroundColor: currentStep > step.num ? theme.green : theme.line,
                     }}
                   />
                 )}
