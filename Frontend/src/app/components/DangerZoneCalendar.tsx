@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import {
   startOfMonth,
   endOfMonth,
@@ -30,7 +31,7 @@ export function DangerZoneCalendar({ dueDate, breakingPoint }: DangerZoneCalenda
   const isHighRisk = breakingPoint < 15;
   const isMediumRisk = breakingPoint >= 15 && breakingPoint < 30;
 
-  function getDayStyle(day: Date): React.CSSProperties {
+  function getDayStyle(day: Date): CSSProperties {
     if (isSameDay(day, due)) {
       return {
         backgroundColor: "#dc2626",
