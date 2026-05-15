@@ -67,7 +67,7 @@ Avoid concepts that depend on bank partnerships, live payment rails, regulatory 
    - Keep diffs scoped to the request.
    - If sandboxing blocks a needed command, request escalation for that command.
    - If parallel work helps, split tasks cleanly.
-   - At the end of a meaningful session, use `context/SESSION_CLOSEOUT.md`.
+   - At the end of a meaningful session, use `context/PROJECT_HANDOFF.md`.
 
 ## Concept Quality Bar
 

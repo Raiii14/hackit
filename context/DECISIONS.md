@@ -65,8 +65,22 @@ Status: active
 ## 2026-05-13
 
 Decision: Treat pre-PR closeout and stale-fact checks as mandatory.
-Why: Previous pull requests skipped `context/SESSION_CLOSEOUT.md`, causing stale source-of-truth files and forcing later audit/clarification work.
+Why: Previous pull requests skipped closeout, causing stale source-of-truth files and forcing later audit/clarification work.
 Impact: Before opening or merging a pull request, update owning files, log durable decisions, and check that `README.md`, `TEAM_WORKFLOW.md`, `features.md`, `systemflow.md`, `DESIGN.md`, and `context/DECISIONS.md` agree. Stale facts are a review blocker.
+Status: active
+
+## 2026-05-16
+
+Decision: Use `context/PROJECT_HANDOFF.md` as the active continuity and closeout file.
+Why: The repo now needs one current handoff file instead of a historical session-closeout log.
+Impact: Meaningful sessions and pre-PR checks should update `context/PROJECT_HANDOFF.md`; `context/SESSION_CLOSEOUT.md` is removed.
+Status: active
+
+## 2026-05-16
+
+Decision: Treat `Frontend/` as the canonical LoanWise app; archive root `src/` after porting loan logic.
+Why: The team ships and pitches from the Figma-based wizard in `Frontend/`, not the legacy single-page `src/` build.
+Impact: All formula and flow work goes in `Frontend/src/lib/` (`loanLogic.ts`, `evaluation.ts`). Read `context/TEAM_PLAN_LEAN.md` for lane assignments. Run `cd Frontend && npm run dev`.
 Status: active
 
 ## 2026-05-14

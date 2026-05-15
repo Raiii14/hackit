@@ -23,11 +23,11 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import type { LoanInputs, EvaluationResult } from "../App";
-import { calculateEvaluation } from "../App";
 
 interface Props {
   inputs: LoanInputs;
   result: EvaluationResult;
+  baselineResult: EvaluationResult;
   stressLevel: number;
   onStressChange: (v: number) => void;
   onBack: () => void;
@@ -87,6 +87,7 @@ function fmt(n: number) {
 export function StepStressTest({
   inputs,
   result,
+  baselineResult,
   stressLevel,
   onStressChange,
   onBack,
@@ -94,38 +95,27 @@ export function StepStressTest({
 }: Props) {
   const [openLesson, setOpenLesson] = useState<number | null>(null);
 
-  // Stressed inputs
-  const stressedInputs = useMemo(
-    () => ({
-      ...inputs,
-      normalCashAfter: inputs.normalCashAfter * (1 - stressLevel / 100),
-      badDayCashAfter: inputs.badDayCashAfter * (1 - stressLevel / 100),
-    }),
-    [inputs, stressLevel]
-  );
+  const daysUntilDue = result.daysUntilDue;
 
-  const stressedResult = useMemo(
-    () => calculateEvaluation(stressedInputs),
-    [stressedInputs]
-  );
-
-  // Chart data: cash after repay across income drops
+  // Chart: projected cash at due date across income drops (term formula)
   const chartData = useMemo(() => {
     return Array.from({ length: 91 }, (_, i) => {
       const factor = 1 - i / 100;
       return {
         drop: i,
-        normal: +(inputs.normalCashAfter * factor - inputs.repaymentAmount).toFixed(2),
-        bad: +(inputs.badDayCashAfter * factor - inputs.repaymentAmount).toFixed(2),
+        normal: +(
+          inputs.normalCashAfter * factor * daysUntilDue -
+          inputs.repaymentAmount
+        ).toFixed(2),
+        bad: +(
+          inputs.badDayCashAfter * factor * daysUntilDue - inputs.repaymentAmount
+        ).toFixed(2),
       };
     });
-  }, [inputs]);
+  }, [inputs, daysUntilDue]);
 
-  const bp = result.breakingPoint;
+  const bp = baselineResult.breakingPoint;
   const isPastBreaking = stressLevel > bp;
-
-  const stressedNormal = inputs.normalCashAfter * (1 - stressLevel / 100) - inputs.repaymentAmount;
-  const stressedBad = inputs.badDayCashAfter * (1 - stressLevel / 100) - inputs.repaymentAmount;
 
   const saferSuggestion = result.saferLoanAmount;
   const canSuggestSafer = saferSuggestion < inputs.loanAmount * 0.95 && saferSuggestion > 0;
@@ -214,14 +204,14 @@ export function StepStressTest({
           <div className="space-y-2">
             {[
               {
-                label: "Normal Day (stressed)",
-                val: stressedNormal,
-                orig: inputs.normalCashAfter - inputs.repaymentAmount,
+                label: "Projected cash (stressed)",
+                val: result.projectedCash,
+                orig: baselineResult.projectedCash,
               },
               {
-                label: "Bad Day (stressed)",
-                val: stressedBad,
-                orig: inputs.badDayCashAfter - inputs.repaymentAmount,
+                label: "Bad-day scenario (full term)",
+                val: result.cashAfterBad,
+                orig: baselineResult.cashAfterBad,
               },
             ].map(({ label, val, orig }) => (
               <div
@@ -267,7 +257,7 @@ export function StepStressTest({
               ? `At ${stressLevel}% income drop`
               : "Baseline (no income drop)"}
           </p>
-          <CashHealthGauge score={stressedResult.healthScore} size={250} />
+          <CashHealthGauge score={result.healthScore} size={250} />
           {stressLevel > 0 && (
             <div
               className="w-full mt-2 flex items-center gap-2 p-2.5 rounded-xl"
@@ -275,19 +265,19 @@ export function StepStressTest({
             >
               <TrendingDown size={13} color="#6b7280" />
               <p style={{ fontSize: "0.72rem", color: "#6b7280" }}>
-                Baseline score: <strong>{Math.round(result.healthScore)}</strong> →{" "}
+                Baseline score: <strong>{Math.round(baselineResult.healthScore)}</strong> →{" "}
                 Stressed score:{" "}
                 <strong
                   style={{
                     color:
-                      stressedResult.healthStatus === "red"
+                      result.healthStatus === "red"
                         ? "#dc2626"
-                        : stressedResult.healthStatus === "yellow"
-                        ? "#d97706"
-                        : "#16a34a",
+                        : result.healthStatus === "yellow"
+                          ? "#d97706"
+                          : "#16a34a",
                   }}
                 >
-                  {Math.round(stressedResult.healthScore)}
+                  {Math.round(result.healthScore)}
                 </strong>
               </p>
             </div>

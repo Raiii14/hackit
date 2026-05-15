@@ -10,9 +10,10 @@ Use this file to onboard team members, AI tools, or a fresh work session for the
 4. `features.md` - active core feature scope for the repayment stress simulator.
 5. `systemflow.md` - active user flow, data flow, and input requirements.
 6. `DESIGN.md` - visual direction and design-system guardrails for prototype screens.
-7. `context/OLD_IDEAS.md` - rejected earlier directions and why they should not be revived casually.
-8. `context/DECISIONS.md` - stable decisions that future work must respect.
-9. `context/SESSION_CLOSEOUT.md` - checklist for ending meaningful sessions and pull requests.
+7. `context/TEAM_PLAN_LEAN.md` - compact frontend execution plan for the pitch prototype.
+8. `context/OLD_IDEAS.md` - rejected earlier directions and why they should not be revived casually.
+9. `context/DECISIONS.md` - stable decisions that future work must respect.
+10. `context/PROJECT_HANDOFF.md` - current continuity, risks, next focus, and closeout checklist.
 
 ## Current Project Frame
 
@@ -33,6 +34,7 @@ Use this file to onboard team members, AI tools, or a fresh work session for the
 - Use `DESIGN.md` for visual style, layout, typography, color, and component direction.
 - Use `context/ONLINE_DATA_AND_GAPS.md` for market evidence and problem justification.
 - Use `context/OLD_IDEAS.md` before bringing back older ideas.
+- Use `context/TEAM_PLAN_LEAN.md` for frontend lane coordination.
 - Do not treat chat history, personal memory, or copied notes as the source of truth when a repo file owns the information.
 
 ## Parallel Work Note
@@ -55,7 +57,7 @@ Avoid editing those files at the same time unless you are intentionally coordina
 - Support factual claims with sources from `context/ONLINE_DATA_AND_GAPS.md` or add sources there.
 - Do not include school-identifying details in preliminary deliverables unless the official rules change.
 - Keep durable decisions in `context/DECISIONS.md`, not buried in chat.
-- Before opening or merging a pull request, run `context/SESSION_CLOSEOUT.md`; stale facts are treated as a review blocker.
+- Before opening or merging a pull request, run the checklist in `context/PROJECT_HANDOFF.md`; stale facts are treated as a review blocker.
 - If a change makes any file stale, update that owning file in the same pull request.
 - When unsure, choose the narrower, more defensible version.
 
@@ -93,4 +95,4 @@ At the end of a meaningful session, record:
 - The next active focus for the team.
 - Whether `README.md`, `TEAM_WORKFLOW.md`, `features.md`, `systemflow.md`, `DESIGN.md`, and `context/DECISIONS.md` still agree.
 
-Use `context/SESSION_CLOSEOUT.md` for the exact closeout format.
+Use `context/PROJECT_HANDOFF.md` for the closeout checklist and current continuity notes.

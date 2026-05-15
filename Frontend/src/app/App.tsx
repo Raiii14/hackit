@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Shield, History } from "lucide-react";
 import { LandingPage } from "./components/LandingPage";
 import { StepIndicator } from "./components/StepIndicator";
@@ -6,32 +6,14 @@ import { StepBaseline } from "./components/StepBaseline";
 import { StepEvaluation } from "./components/StepEvaluation";
 import { StepStressTest } from "./components/StepStressTest";
 import { StepHistory } from "./components/StepHistory";
+import type { UiLoanInputs } from "../lib/loanAdapter";
+import {
+  evaluateLoanAtStressLevel,
+  type EvaluationResult,
+} from "../lib/evaluation";
 
-export interface LoanInputs {
-  loanAmount: number;
-  repaymentAmount: number;
-  dueDate: string;
-  loanPurpose: string;
-  normalCashAfter: number;
-  badDayCashAfter: number;
-  minCashBuffer: number;
-}
-
-export interface EvaluationResult {
-  healthScore: number;
-  healthStatus: "green" | "yellow" | "red";
-  cashAfterNormal: number;
-  cashAfterBad: number;
-  normalMargin: number;
-  badMargin: number;
-  trueCost: number;
-  effectiveRate: number;
-  dailyCost: number;
-  daysUntilDue: number;
-  breakingPoint: number;
-  saferLoanAmount: number;
-  saferRepaymentAmount: number;
-}
+export type LoanInputs = UiLoanInputs;
+export type { EvaluationResult };
 
 export interface SavedEvaluation {
   id: string;
@@ -41,86 +23,6 @@ export interface SavedEvaluation {
   result: EvaluationResult;
   peakStressLevel: number;
 }
-
-export function calculateEvaluation(inputs: LoanInputs): EvaluationResult {
-  const {
-    loanAmount,
-    repaymentAmount,
-    dueDate,
-    normalCashAfter,
-    badDayCashAfter,
-    minCashBuffer,
-  } = inputs;
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const due = new Date(dueDate + "T00:00:00");
-  const daysUntilDue = Math.max(1, Math.ceil((due.getTime() - today.getTime()) / 86400000));
-
-  const cashAfterNormal = normalCashAfter - repaymentAmount;
-  const cashAfterBad = badDayCashAfter - repaymentAmount;
-  const normalMargin = cashAfterNormal - minCashBuffer;
-  const badMargin = cashAfterBad - minCashBuffer;
-
-  const trueCost = Math.max(0, repaymentAmount - loanAmount);
-  const effectiveRate = loanAmount > 0 ? (trueCost / loanAmount) * 100 : 0;
-  const dailyCost = trueCost / daysUntilDue;
-
-  // Health score: 0–100, weighted toward bad-day scenario
-  const weightedMargin = normalMargin * 0.35 + badMargin * 0.65;
-  const refAmount = Math.max(normalCashAfter, 100);
-  const rawScore = 50 + (weightedMargin / refAmount) * 50;
-  const healthScore = Math.max(0, Math.min(100, rawScore));
-
-  let healthStatus: "green" | "yellow" | "red";
-  if (badMargin < 0 || healthScore < 33) {
-    healthStatus = "red";
-  } else if (healthScore < 66) {
-    healthStatus = "yellow";
-  } else {
-    healthStatus = "green";
-  }
-
-  // Breaking point: % income drop where bad day cash falls below buffer
-  let breakingPoint = 100;
-  if (badDayCashAfter > 0) {
-    const needed = repaymentAmount + minCashBuffer;
-    if (needed >= badDayCashAfter) {
-      breakingPoint = 0;
-    } else {
-      breakingPoint = (1 - needed / badDayCashAfter) * 100;
-    }
-  }
-
-  // Safer amounts: repayment that keeps bad-day cash above buffer
-  const saferRepaymentAmount = Math.max(0, badDayCashAfter - minCashBuffer * 1.25);
-  const saferLoanAmount =
-    repaymentAmount > 0
-      ? Math.max(0, loanAmount * (saferRepaymentAmount / repaymentAmount))
-      : 0;
-
-  return {
-    healthScore,
-    healthStatus,
-    cashAfterNormal,
-    cashAfterBad,
-    normalMargin,
-    badMargin,
-    trueCost,
-    effectiveRate,
-    dailyCost,
-    daysUntilDue,
-    breakingPoint,
-    saferLoanAmount,
-    saferRepaymentAmount,
-  };
-}
-
-const makeDefaultDueDate = () => {
-  const d = new Date();
-  d.setDate(d.getDate() + 14);
-  return d.toISOString().split("T")[0];
-};
 
 const DEFAULT_INPUTS: LoanInputs = {
   loanAmount: 0,
@@ -135,26 +37,36 @@ const DEFAULT_INPUTS: LoanInputs = {
 export default function App() {
   const [currentStep, setCurrentStep] = useState(0);
   const [inputs, setInputs] = useState<LoanInputs>(DEFAULT_INPUTS);
-  const [evaluation, setEvaluation] = useState<EvaluationResult | null>(null);
   const [stressLevel, setStressLevel] = useState(0);
   const [savedEvaluations, setSavedEvaluations] = useState<SavedEvaluation[]>([]);
 
+  const baselineEvaluation = useMemo(() => {
+    if (!inputs.dueDate) return null;
+    return evaluateLoanAtStressLevel(inputs, 0);
+  }, [inputs]);
+
+  const stressedEvaluation = useMemo(() => {
+    if (!inputs.dueDate) return null;
+    return evaluateLoanAtStressLevel(inputs, stressLevel);
+  }, [inputs, stressLevel]);
+
   const handleEvaluate = (newInputs: LoanInputs) => {
     setInputs(newInputs);
-    setEvaluation(calculateEvaluation(newInputs));
     setStressLevel(0);
     setCurrentStep(2);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleSave = (peakStress: number) => {
-    if (!evaluation) return;
+    const result = evaluateLoanAtStressLevel(inputs, peakStress);
+    if (!result) return;
+
     const saved: SavedEvaluation = {
       id: Date.now().toString(),
       savedAt: new Date().toISOString(),
       label: inputs.loanPurpose || `₱${inputs.loanAmount.toLocaleString()} Loan`,
       inputs,
-      result: evaluation,
+      result,
       peakStressLevel: peakStress,
     };
     setSavedEvaluations((prev) => [saved, ...prev]);
@@ -165,14 +77,12 @@ export default function App() {
   const handleNew = () => {
     setCurrentStep(1);
     setInputs(DEFAULT_INPUTS);
-    setEvaluation(null);
     setStressLevel(0);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleLoad = (saved: SavedEvaluation) => {
     setInputs(saved.inputs);
-    setEvaluation(saved.result);
     setStressLevel(saved.peakStressLevel);
     setCurrentStep(2);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -184,7 +94,7 @@ export default function App() {
 
   const canNavigate = (step: number) => {
     if (step === 1) return true;
-    if (step === 2 || step === 3) return evaluation !== null;
+    if (step === 2 || step === 3) return baselineEvaluation !== null;
     if (step === 4) return savedEvaluations.length > 0;
     return false;
   };
@@ -287,19 +197,20 @@ export default function App() {
           <StepBaseline inputs={inputs} onNext={handleEvaluate} />
         )}
 
-        {currentStep === 2 && evaluation && (
+        {currentStep === 2 && baselineEvaluation && (
           <StepEvaluation
             inputs={inputs}
-            result={evaluation}
+            result={baselineEvaluation}
             onBack={() => setCurrentStep(1)}
             onNext={() => setCurrentStep(3)}
           />
         )}
 
-        {currentStep === 3 && evaluation && (
+        {currentStep === 3 && stressedEvaluation && baselineEvaluation && (
           <StepStressTest
             inputs={inputs}
-            result={evaluation}
+            result={stressedEvaluation}
+            baselineResult={baselineEvaluation}
             stressLevel={stressLevel}
             onStressChange={setStressLevel}
             onBack={() => setCurrentStep(2)}

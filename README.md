@@ -10,11 +10,12 @@ The project is aimed at the **FinTech for Change** theme and should stay grounde
 
 ## Prototype
 
-The current website prototype is a Vite + React + TypeScript app with optional Supabase email/password auth.
+The current pitch prototype is the Vite + React + TypeScript app in `Frontend/`.
 
 Run locally:
 
 ```bash
+cd Frontend
 npm install
 npm run dev
 ```
@@ -22,6 +23,7 @@ npm run dev
 Production check:
 
 ```bash
+cd Frontend
 npm run lint
 npm run build
 ```
@@ -43,17 +45,18 @@ The app is ready for Vercel deployment as a standard Vite project. Add the same 
 - `TEAM_WORKFLOW.md` - team workflow, AI coordination, work lanes, and session rules.
 - `guidelines.md` - official Hack-It-UP 2026 onboarding details and challenge requirements.
 - `context/PROJECT_GUIDE.md` - shared rules for concept, pitch, prototype, and AI-assisted work.
+- `context/TEAM_PLAN_LEAN.md` - compact frontend execution plan for the pitch prototype.
 - `context/ONLINE_DATA_AND_GAPS.md` - evidence base and market gap behind the concept.
 - `features.md` - active core feature scope for the repayment stress simulator.
 - `systemflow.md` - active user flow, data flow, and input requirements.
 - `DESIGN.md` - visual direction and design-system guardrails for avoiding generic website output.
 - `context/OLD_IDEAS.md` - earlier ideas and why they were not selected.
 - `context/DECISIONS.md` - stable decisions that affect later work.
-- `context/SESSION_CLOSEOUT.md` - checklist for ending meaningful work sessions.
+- `context/PROJECT_HANDOFF.md` - current continuity, risks, next focus, and closeout checklist.
 - `supabase/schema.sql` - optional Supabase table and row-level-security setup for saved loan checks.
 
 ## Collaboration Rule
 
 Keep durable project context in repo files, not only in chat history. If a decision changes the concept, prototype scope, pitch, or submission plan, update the owning file in `context/`.
 
-Before opening or merging a pull request, run the closeout checklist in `context/SESSION_CLOSEOUT.md` and make sure the owning files are updated.
+Before opening or merging a pull request, run the closeout checklist in `context/PROJECT_HANDOFF.md` and make sure the owning files are updated.
