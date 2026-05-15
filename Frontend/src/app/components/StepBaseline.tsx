@@ -103,7 +103,9 @@ export function StepBaseline({ inputs, onNext }: Props) {
     if (!normal || normal <= 0) errs.normalCashAfter = "Enter normal day cash";
     if (!bad || bad <= 0) errs.badDayCashAfter = "Enter bad day cash";
     if (bad > normal) errs.badDayCashAfter = "Should be ≤ normal day cash";
-    if (buffer === undefined || buffer < 0) errs.minCashBuffer = "Enter a minimum buffer (can be 0)";
+    if (!Number.isFinite(buffer) || buffer < 0) {
+      errs.minCashBuffer = "Enter a minimum buffer (can be 0)";
+    }
 
     setErrors(errs);
     return Object.keys(errs).length === 0;
