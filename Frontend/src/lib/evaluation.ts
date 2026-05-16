@@ -31,22 +31,24 @@ function clamp(value: number, min: number, max: number): number {
 function cashPositionToHealthScore(
   projectedCash: number,
   minimumBuffer: number,
-  totalRepayment: number,
+  baselineProjectedCash: number,
 ): number {
-  const repaymentScale = Math.max(1, totalRepayment);
-
+  // Red zone: projected cash is negative
   if (projectedCash < 0) {
-    return Math.round(32 * clamp((projectedCash + repaymentScale) / repaymentScale, 0, 1));
+    const scale = Math.max(1, baselineProjectedCash);
+    return Math.round(32 * clamp((projectedCash + scale) / scale, 0, 1));
   }
 
+  // Yellow zone: below buffer but still positive
   if (projectedCash < minimumBuffer) {
     const bufferScale = Math.max(1, minimumBuffer);
     return Math.round(33 + 32 * clamp(projectedCash / bufferScale, 0, 1));
   }
 
-  const surplusScale = Math.max(1, minimumBuffer, totalRepayment);
-  const surplus = projectedCash - minimumBuffer;
-  return Math.round(66 + 34 * clamp(surplus / surplusScale, 0, 1));
+  // Green zone: score = how much of baseline cash do you retain?
+  // baseline is the natural ceiling — stressed / baseline gives a 0–1 ratio
+  const scale = Math.max(1, baselineProjectedCash);
+  return Math.round(66 + 34 * clamp(projectedCash / scale, 0, 1));
 }
 
 const badDayMode = stressModes.find((mode) => mode.kind === 'bad-day')!;
@@ -84,7 +86,11 @@ export function evaluateLoan(
   const logic = toLogicInputs(ui);
   const sim = simulateLoan(logic, stressMode, customDrop);
   const baseline = simulateLoan(logic, baselineMode, 0);
-  const badDay = simulateLoan(logic, badDayMode, 0);
+  // Apply stress to bad-day cash so the bad-day row updates with the slider
+  const stressedBadDayLogic = customDrop > 0
+    ? { ...logic, badDayCashLeft: logic.badDayCashLeft * (1 - customDrop / 100) }
+    : logic;
+  const badDay = simulateLoan(stressedBadDayLogic, badDayMode, 0);
   const saferRepaymentAmount = Math.max(
     0,
     ui.badDayCashAfter * sim.daysUntilDue - ui.minCashBuffer,
@@ -94,7 +100,7 @@ export function evaluateLoan(
     healthScore: cashPositionToHealthScore(
       sim.projectedCash,
       ui.minCashBuffer,
-      ui.repaymentAmount,
+      baseline.projectedCash,
     ),
     healthStatus: sim.status,
     projectedCash: sim.projectedCash,

@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, KeyboardEvent, useState } from "react";
 import { Bot, Loader2, MessageCircle, Send } from "lucide-react";
 import type { EvaluationResult, LoanInputs } from "../App";
 import {
@@ -17,6 +17,7 @@ import {
   DrawerTrigger,
 } from "./ui/drawer";
 import { Textarea } from "./ui/textarea";
+import { formatChatAssistantText } from "./chatMessageFormat";
 
 interface Props {
   inputs: LoanInputs;
@@ -68,6 +69,12 @@ export function LoanWiseChat({ inputs, result, contextLabel = "current result" }
     void sendMessage(draft);
   };
 
+  const handleTextareaKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key !== "Enter" || event.shiftKey) return;
+    event.preventDefault();
+    if (canSend) void sendMessage(draft);
+  };
+
   return (
     <Drawer direction="right">
       <DrawerTrigger asChild>
@@ -81,7 +88,7 @@ export function LoanWiseChat({ inputs, result, contextLabel = "current result" }
           Ask AI
         </Button>
       </DrawerTrigger>
-      <DrawerContent className="bg-white">
+      <DrawerContent className="bg-white max-h-[100dvh] select-text">
         <DrawerHeader>
           <DrawerTitle className="flex items-center gap-2">
             <Bot size={18} />
@@ -92,7 +99,11 @@ export function LoanWiseChat({ inputs, result, contextLabel = "current result" }
           </DrawerDescription>
         </DrawerHeader>
 
-        <div className="flex-1 overflow-y-auto px-4 pb-4">
+        <div
+          className="flex-1 min-h-0 overflow-y-auto px-4 pb-4 select-text"
+          data-vaul-no-drag
+          style={{ WebkitUserSelect: "text", userSelect: "text" }}
+        >
           {!isLoanWiseChatConfigured && (
             <div
               className="rounded-xl p-3"
@@ -148,17 +159,19 @@ export function LoanWiseChat({ inputs, result, contextLabel = "current result" }
                   className={isUser ? "flex justify-end" : "flex justify-start"}
                 >
                   <div
-                    className="max-w-[88%] rounded-xl px-3 py-2"
+                    className="max-w-[88%] cursor-text select-text rounded-xl px-3 py-2"
                     style={{
                       backgroundColor: isUser ? "#2563eb" : "#f8fafc",
                       color: isUser ? "white" : "#111827",
                       border: isUser ? "none" : "1px solid #e2e8f0",
                       fontSize: "0.84rem",
                       lineHeight: 1.55,
-                      whiteSpace: "pre-wrap",
+                      whiteSpace: isUser ? "pre-wrap" : "normal",
+                      WebkitUserSelect: "text",
+                      userSelect: "text",
                     }}
                   >
-                    {message.content}
+                    {isUser ? message.content : formatChatAssistantText(message.content)}
                   </div>
                 </div>
               );
@@ -188,7 +201,8 @@ export function LoanWiseChat({ inputs, result, contextLabel = "current result" }
               value={draft}
               disabled={!isLoanWiseChatConfigured || isLoading}
               onChange={(event) => setDraft(event.target.value)}
-              placeholder="Ask why the result is green, yellow, or red..."
+              onKeyDown={handleTextareaKeyDown}
+              placeholder="Ask why the result is green, yellow, or red… (Enter to send, Shift+Enter for new line)"
               rows={3}
             />
             <Button

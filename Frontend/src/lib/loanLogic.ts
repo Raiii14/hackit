@@ -34,7 +34,7 @@ export const stressModes: StressMode[] = [
     shortLabel: '100% drop',
     kind: 'drop',
     drop: 100,
-    durationDays: 3,
+    durationDays: null,
   },
   {
     label: 'My bad day',

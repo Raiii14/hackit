@@ -537,6 +537,9 @@ export function StepStressTest({
                     setSelectedScenarioId("manual");
                     const next = Math.min(Number(e.target.value), stressHigh);
                     setStressLow(next);
+                    // Keep the parent's stressLevel in sync with the effective high
+                    const effectiveHigh = Math.max(next, stressLevel);
+                    if (effectiveHigh !== stressLevel) onStressChange(effectiveHigh);
                   }}
                   aria-label="Manual low stress percentage"
                   style={{ width: "100%", accentColor: "#a78bfa" }}
@@ -558,7 +561,7 @@ export function StepStressTest({
                 <input
                   type="range"
                   min={0}
-                  max={100}
+                  max={99}
                   step={1}
                   value={stressHigh}
                   onChange={(e) => {
@@ -587,10 +590,10 @@ export function StepStressTest({
               <input
                 type="number"
                 min={stressLow}
-                max={100}
+                max={99}
                 value={stressHigh}
                 onChange={(event) => {
-                  const next = Math.min(100, Math.max(stressLow, Number(event.target.value) || 0));
+                  const next = Math.min(99, Math.max(stressLow, Number(event.target.value) || 0));
                   setSelectedScenarioId("manual");
                   onStressChange(next);
                 }}

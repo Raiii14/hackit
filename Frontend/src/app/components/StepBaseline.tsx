@@ -211,8 +211,8 @@ export function StepBaseline({ inputs, onNext }: Props) {
           <div className="space-y-4">
             <div>
               <InputField
-                label="Normal day — cash left"
-                hint="After all regular bills & expenses on a typical day"
+                label="Normal day — net cash (per day)"
+                hint="Daily cash left after all regular expenses on a typical day (e.g. ₱800/day, not monthly total)"
                 prefix="₱"
                 value={form.normalCashAfter}
                 onChange={(v) => set("normalCashAfter", v)}
@@ -227,8 +227,8 @@ export function StepBaseline({ inputs, onNext }: Props) {
 
             <div>
               <InputField
-                label="Bad day — cash left"
-                hint="On your worst realistic day (late client, unexpected bill)"
+                label="Bad day — net cash (per day)"
+                hint="Daily cash left on your worst realistic day — late client, unexpected bill (must be ≤ normal day)"
                 prefix="₱"
                 value={form.badDayCashAfter}
                 onChange={(v) => set("badDayCashAfter", v)}
